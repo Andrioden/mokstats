@@ -2,7 +2,6 @@
 ## Custom
 #################
 
-settings.py
 /logs
 /static
 /env

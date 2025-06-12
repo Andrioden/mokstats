@@ -57,6 +57,8 @@ else:
 ********************************************************
 """
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 STATIC_ROOT = 'static'
 STATIC_URL = '/static/'
 ROOT_URLCONF = 'mokstats.urls'
@@ -86,7 +88,7 @@ INSTALLED_APPS = (
     'mokstats',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
