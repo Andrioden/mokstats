@@ -21,14 +21,14 @@ jobs:
           project_id: mokstats
 
       # Setup python environment
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
           cache: "poetry"
-
-      - name: Install pipenv
-        run: pip install pipenv
 
       - name: Install poetry env
         run: poetry install
