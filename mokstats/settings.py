@@ -121,12 +121,12 @@ TEMPLATES = [
     },
 ]
 
-CACHE_SECONDS = 60*60*24*365 # 1 year
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'site_cache',
-        'TIMEOUT': CACHE_SECONDS,
-    }
-}
-CACHE_MIDDLEWARE_SECONDS = CACHE_SECONDS
+# CACHE_SECONDS = 60*60*24*365 # 1 year
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'site_cache',
+#         'TIMEOUT': CACHE_SECONDS,
+#     }
+# }
+# CACHE_MIDDLEWARE_SECONDS = CACHE_SECONDS
