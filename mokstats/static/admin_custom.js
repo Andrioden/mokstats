@@ -12,7 +12,7 @@
  */
 $(document).ready(function() {
 	var playersTable = $('table').first();
-	
+
 	// Left float delete match button
 	$('.deletelink-box').addClass("left");
 
@@ -24,17 +24,17 @@ $(document).ready(function() {
 	// Triggers when a player result value is changed
 	playersTable.on('change', 'input', summarizePlayerResult);
 	playersTable.on('change', 'input', autofillLastPlayerResultPossibly);
-	
+
 	// Initiate settings
 	settings.initSettingsBox();
 });
 
 function loadLastMatchPlayers() {
-    var playersTable = $('table').first();
+    var playersTable = $('#playerresult_set-group').find('table').first();
 
-    $.get('../../../../ajax/last_playerlist/', function(data) {
+    $.get('/ajax/last_playerlist/', function(data) {
         $(data).each(function(i, id) {
-            var playerRowCount = playersTable.find('select').size()-1;
+            var playerRowCount = playersTable.find('select').length - 1;
             if (i > playerRowCount-1)
                 $('.add-row').find('a')[0].click(); //New player row
             playersTable.find('select').eq(i).val(id);
@@ -134,18 +134,18 @@ function changeAnimate(obj) {
 
 var settings = new function() {
 	var PREPEND = "setting.";
-	
+
 	this.getSetting = function(key) {
 		return window.localStorage.getItem(PREPEND+key);
 	};
-	
+
 	this.setSetting = function(key, val) {
 		window.localStorage.setItem(PREPEND+key, val);
 	};
-	
+
 	this.initSettingsBox = function() {
 		var thisSettings = this;
-		
+
 		var cBox = $('<span class="setting_item left"><input type="checkbox"> Automatic Calculation</span>');
 		if (this.getSetting("auto-calc") == "true") cBox.find('input').prop('checked', true);
 		cBox.find('input').on("click", function() {
