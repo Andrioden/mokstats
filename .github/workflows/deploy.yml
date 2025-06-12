@@ -1,4 +1,4 @@
-name: Deploy to template
+name: Deploy
 on:
   workflow_dispatch:
 
