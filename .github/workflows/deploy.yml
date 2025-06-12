@@ -38,7 +38,7 @@ jobs:
 
       # Deploy
       - name: Collectstatic
-        run: pipenv run python manage.py collectstatic --noinput
+        run: poetry run python manage.py collectstatic --noinput
 
       - name: Generate requirements.txt
         run: |
@@ -66,9 +66,9 @@ jobs:
           DB_PASSWORD: ${{secrets.GCLOUD_PROD_DB_PASSWORD}}
           DJANGO_SUPERUSER_PASSWORD: ${{secrets.DJANGO_SUPERUSER_PASSWORD}}
         run: |
-          pipenv run python manage.py migrate
-          pipenv run python manage.py createsuperuser --username andre --email andre.okul@gmail.com --no-input || true
-          pipenv run python cli.py populate
+          poetry run python manage.py migrate
+          poetry run python manage.py createsuperuser --username andre --email andre.okul@gmail.com --no-input || true
+          poetry run python cli.py populate
 
       # Clean up (source: https://stackoverflow.com/a/66911696/686131)
       - name: Delete old app engine versions
