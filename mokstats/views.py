@@ -3,7 +3,9 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.db.models import Max, Min, Avg, Count
-from .models import Place, Player, PlayerResult, Match, cur_config
+
+from .config import ACTIVE_PLAYER_MATCH_THRESHOLD, RATING_K, RATING_START
+from .models import Place, Player, PlayerResult, Match
 from .rating import RatingCalculator, RatingResult
 import calendar
 import os
@@ -62,7 +64,7 @@ def players(request):
         p = {'name': place.name}
         p['selected'] = "selected" if (place.id in place_ids) else ""
         places.append(p)
-    data = {'players': players, 'places': places, 'config': {'active_treshold': cur_config().active_player_match_treshold}}
+    data = {'players': players, 'places': places, 'config': {'active_treshold': ACTIVE_PLAYER_MATCH_THRESHOLD}}
 
     return render(request, 'players.html', data)
 
@@ -157,7 +159,7 @@ def match(request, mid):
 def stats(request):
     """ This is the stats page that show all the stats that didnt fit
     anywhere else.
-    
+
     """
     ALL_RESULTS = PlayerResult.objects.select_related()
     PRS = PlayerResultStatser(ALL_RESULTS)
@@ -262,9 +264,8 @@ def rating(request):
     # Only list active players
     active_players = []
     players = Player.objects.all()
-    active_player_match_treshold = cur_config().active_player_match_treshold
     for p in players:
-        if PlayerResult.objects.filter(player_id=p.id).count() >= active_player_match_treshold:
+        if PlayerResult.objects.filter(player_id=p.id).count() >= ACTIVE_PLAYER_MATCH_THRESHOLD:
             active_players.append(p)
     # Create data context and return response
     data = {'max': {'pid': max_obj.player_id, 'pname': max_obj.player.name,
@@ -278,9 +279,8 @@ def rating(request):
 
 
 def rating_description(request):
-    conf = cur_config()
-    data = {'K_VALUE': int(conf.rating_k),
-            'START_RATING': int(conf.rating_start)}
+    data = {'K_VALUE': int(RATING_K),
+            'START_RATING': int(RATING_START)}
     return render(request, 'rating-description.html', data)
 
 
@@ -326,7 +326,6 @@ def _month_name(month_number):
 
 def _update_ratings():
     calc = RatingCalculator()
-    START_RATING = cur_config().rating_start
     players = {}
     match_ids = list(set(PlayerResult.objects.filter(rating=None).values_list('match_id', flat=True)))
     for match in Match.objects.filter(id__in=match_ids).order_by('date', 'id'):
@@ -336,7 +335,7 @@ def _update_ratings():
             # Fetch the current rating value
             rated_results = PlayerResult.objects.filter(player=p['id']).exclude(rating=None).order_by('-match__date', '-match__id')
             if not rated_results.exists():
-                rating = START_RATING
+                rating = RATING_START
             else:
                 rating = rated_results[0].rating
             rating_results.append(RatingResult(p['id'], rating, p['position']))
@@ -351,7 +350,7 @@ def _update_ratings():
 class PlayerResultStatser:
     """ Does all kind of statistical fun fact calculations with the
     supplied PlayerResult object.
-    
+
     """
     ALL_RESULTS = None
 

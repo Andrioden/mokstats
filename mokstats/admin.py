@@ -88,4 +88,3 @@ class ConfigurationAdmin(admin.ModelAdmin):
 admin.site.register(Player)
 admin.site.register(Place)
 admin.site.register(Match, MatchAdmin)
-admin.site.register(Configuration, ConfigurationAdmin)

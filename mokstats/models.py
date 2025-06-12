@@ -1,23 +1,22 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, PROTECT
 from django.db.models.signals import post_save, post_delete
 from django.core.cache import cache
 
 import datetime
-from decimal import Decimal
 
 import logging
-logger = logging.getLogger(__name__)
 
-def cur_config():
-    return Configuration.objects.latest('id')
+from mokstats.config import RATING_START
+
+logger = logging.getLogger(__name__)
 
 class Player(models.Model):
     name = models.CharField(max_length=20, unique=True)
     def get_ratings(self):
         results = PlayerResult.objects.filter(player=self).select_related('match')
         ratings = []
-        prev_rating = cur_config().rating_start
+        prev_rating = RATING_START
         for res in results.order_by('match__date', 'match__id'):
             dif = res.rating-prev_rating
             if dif > 0:
@@ -27,7 +26,7 @@ class Player(models.Model):
                 css_class = "negative"
             else:
                 css_class = ""
-            ratings.append([res.match.date.isoformat(), int(res.rating), 
+            ratings.append([res.match.date.isoformat(), int(res.rating),
                             css_class, str(dif), int(res.match.id)])
             prev_rating = res.rating
         return ratings
@@ -40,7 +39,7 @@ class Place(models.Model):
     name = models.CharField(max_length=20)
     def __unicode__(self):
         return self.name
-    
+
 def _get_last_match_date():
     match_count = Match.objects.count()
     if match_count == 0:
@@ -53,10 +52,10 @@ def _get_last_match_place():
         return None
     else:
         return Match.objects.all()[match_count-1].place_id
-    
+
 class Match(models.Model):
     date = models.DateField(default=_get_last_match_date)
-    place = models.ForeignKey(Place, default=_get_last_match_place)
+    place = models.ForeignKey(Place, default=_get_last_match_place, on_delete=PROTECT)
     def get_winners(self):
         min_sum = 1000
         winners = []
@@ -85,7 +84,7 @@ class Match(models.Model):
                 if splayers[i]['total'] == splayers[0]['total']:
                     return 1
                 # Check if player got same total as someone ahead in the sorted list
-                for pos in range(i): 
+                for pos in range(i):
                     if splayers[i]['total'] == splayers[pos]['total']:
                         return pos+1
                 # Check if player got same total as someone behind in the sorted list
@@ -117,11 +116,11 @@ class Match(models.Model):
         return "%s - %s (ID: %s)" % (self.date, self.place.name, self.pk)
     class Meta:
         verbose_name = "Match"
-        verbose_name_plural = "Matches" 
-        
+        verbose_name_plural = "Matches"
+
 class PlayerResult(models.Model):
-    match = models.ForeignKey(Match)
-    player = models.ForeignKey(Player)
+    match = models.ForeignKey(Match, on_delete=PROTECT)
+    player = models.ForeignKey(Player, on_delete=PROTECT)
     sum_spades = models.PositiveSmallIntegerField()
     sum_queens = models.PositiveSmallIntegerField()
     sum_solitaire_lines = models.PositiveSmallIntegerField()
@@ -135,10 +134,10 @@ class PlayerResult(models.Model):
             return "?"
         older_matches = self.match.get_older_matches().values_list('id', flat=True)
         older_results = PlayerResult.objects.filter(player=self.player).filter(match__id__in=older_matches)
-        if older_results.exists(): 
+        if older_results.exists():
             return self.rating - older_results.order_by('-match__date', '-match__id')[0].rating
         else:
-            return self.rating - cur_config().rating_start
+            return self.rating - RATING_START
     def vals(self):
         return {'player': {'id': self.player.id,
                            'name': self.player.name},
@@ -163,19 +162,7 @@ class PlayerResult(models.Model):
     class Meta:
         unique_together = ("match", "player")
 
-class Configuration(models.Model):
-    active_player_match_treshold = models.PositiveSmallIntegerField("Terskel aktiv spiller (kamper)", default=20)
-    rating_start = models.DecimalField("Rating: startverdi", max_digits=6, 
-                                       decimal_places=2, default=Decimal("100.00"))
-    rating_k = models.DecimalField("Rating: K-Verdi", max_digits=6,
-                                   decimal_places=2, default=Decimal("2.00"))
-    def __unicode__(self):
-        if self.pk == cur_config().id:
-            return "** Current config**"
-        else:
-            return "Unused config"
-        
-        
+
 """----------------------------- SIGNALS -----------------------------------
 ----------------------------------------------------------------------------
 -------------------------------------------------------------------------"""
@@ -208,9 +195,3 @@ post_delete.connect(clear_cache, sender=Match)
 
 post_save.connect(clear_affected_results_rating, sender=Match)
 post_delete.connect(clear_affected_results_rating, sender=Match)
-
-post_save.connect(clear_cache, sender=Configuration)
-post_delete.connect(clear_cache, sender=Configuration)
-
-post_save.connect(clear_all_rating, sender=Configuration)
-post_delete.connect(clear_all_rating, sender=Configuration)

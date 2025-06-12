@@ -1,9 +1,10 @@
 from decimal import Decimal
-from .models import cur_config
+
+from .config import RATING_K
 
 class RatingCalculator:
     def __init__(self):
-        self.K = cur_config().rating_k
+        self.K = RATING_K
     def new_ratings(self, player_rating_results):
         total_rating = sum([p.rating for p in player_rating_results])
         points_for_position = self.points_for_position(player_rating_results)
@@ -20,15 +21,15 @@ class RatingCalculator:
             p.rating += self.K * (actual_points - expected_points)
             #print "(%s) %s - Win chance of %s and position %s, gives expected/actual points of %s/%s and %s as new rating " % (p.dbid, round(from_rating,2), round(win_chance,2), p.position, round(expected_points,2), actual_points, round(p.rating,2))
         return player_rating_results
-    
+
     def points_for_position(self, player_rating_results):
         """ Calculates how much each match positions awards in points, if
         no-one has the same position the for loop does nothing except adding
         and dividing again. The match position to point mapping works as following:
         A total amount of point fluxation is calculated, this defines how much points
-        is lost and gained totaly among all players. Then the point fluxation is 
+        is lost and gained totaly among all players. Then the point fluxation is
         divided among all positions, starting with max and ending with 0.
-        
+
         """
         # Create the normal position to point mapping
         # Change this part if the balance between position, player count and points awarded
@@ -56,7 +57,7 @@ class RatingCalculator:
             for sharer_pos in shared_by:
                 points[sharer_pos] = points_each
         return points
-        
+
 class RatingResult:
     dbid = None
     rating = None
