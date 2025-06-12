@@ -1,8 +1,6 @@
 [tool.poetry]
 package-mode = false
 
-#Django==1.11.7
-#MySQL-python==1.2.5
 [tool.poetry.dependencies]
 python = "^3.13"
 gunicorn = "*"
@@ -11,20 +9,20 @@ django = "==5.2.2"
 #google-cloud-secret-manager = "*"
 
 [tool.poetry.group.dev.dependencies]
-#vulture = "*"
-#isort = "*"
-#black = "*"
-#flake8 = "*"
-#flake8-bugbear = "*"
-#flake8-comprehensions = "*"
-#flake8-pytest-style = "*"
-#Flake8-pyproject = "*"
-#pep8-naming = "*"
-#mypy = "*"
+vulture = "*"
+isort = "*"
+black = "*"
+flake8 = "*"
+flake8-bugbear = "*"
+flake8-comprehensions = "*"
+flake8-pytest-style = "*"
+Flake8-pyproject = "*"
+pep8-naming = "*"
+mypy = "*"
 pytest = "*"
 pytest-django = "*"
 #pytest-mock = "*"
-#django-stubs = "==5.2.0"
+django-stubs = "==5.2.0"
 
 [tool.vulture]
 min_confidence = 61
