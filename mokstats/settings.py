@@ -11,21 +11,21 @@ SECRET_KEY = "asd"
 
 
 # Database settings
-if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
+if os.getenv("SERVER_SOFTWARE", "").startswith("Google App Engine"):
     # Running on production App Engine, so connect to Google Cloud SQL using
     # the unix socket at /cloudsql/<your-cloudsql-connection string>
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': '??',
-            'NAME': 'mokstats',
-            'USER': '??',
-            'PASSWORD': '??',
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "HOST": "??",
+            "NAME": "mokstats",
+            "USER": "??",
+            "PASSWORD": "??",
         }
     }
 else:
     DATABASES = {
-        'default': {
+        "default": {
             "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.postgresql"),
             "HOST": os.environ.get("DB_HOST", "localhost"),
             "PORT": os.environ.get("DB_PORT", "5432"),
@@ -58,9 +58,9 @@ else:
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-STATIC_ROOT = 'static'
-STATIC_URL = '/static/'
-ROOT_URLCONF = 'mokstats.urls'
+STATIC_ROOT = "static"
+STATIC_URL = "/static/"
+ROOT_URLCONF = "mokstats.urls"
 
 USE_TZ = True
 TIME_ZONE = "Etc/UTC"
@@ -68,53 +68,51 @@ LANGUAGE_CODE = "en-us"
 USE_I18N = False  # Translations are not used
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "mokstats/static"),
-)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "mokstats/static"),)
 
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'mokstats',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "mokstats",
 )
 
 MIDDLEWARE = (
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Site wide Cache (https://docs.djangoproject.com/en/1.11/topics/cache/#the-per-site-cache)
-    'django.middleware.cache.UpdateCacheMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+    "django.middleware.cache.UpdateCacheMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
 )
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.debug',
-                'django.template.context_processors.i18n',
-                'django.template.context_processors.media',
-                'django.template.context_processors.static',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
                 "django.template.context_processors.tz",
-                'django.template.context_processors.request',
-                'django.contrib.messages.context_processors.messages',
+                "django.template.context_processors.request",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },

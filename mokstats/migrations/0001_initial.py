@@ -10,56 +10,62 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Place',
+            name="Place",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=20)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=20)),
             ],
         ),
         migrations.CreateModel(
-            name='Player',
+            name="Player",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=20, unique=True)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=20, unique=True)),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Match',
+            name="Match",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField(default=mokstats.models._get_last_match_date)),
-                ('place', models.ForeignKey(default=mokstats.models._get_last_match_place, on_delete=django.db.models.deletion.PROTECT, to='mokstats.place')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("date", models.DateField(default=mokstats.models._get_last_match_date)),
+                (
+                    "place",
+                    models.ForeignKey(
+                        default=mokstats.models._get_last_match_place,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="mokstats.place",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Match',
-                'verbose_name_plural': 'Matches',
+                "verbose_name": "Match",
+                "verbose_name_plural": "Matches",
             },
         ),
         migrations.CreateModel(
-            name='PlayerResult',
+            name="PlayerResult",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sum_spades', models.PositiveSmallIntegerField()),
-                ('sum_queens', models.PositiveSmallIntegerField()),
-                ('sum_solitaire_lines', models.PositiveSmallIntegerField()),
-                ('sum_solitaire_cards', models.PositiveSmallIntegerField()),
-                ('sum_pass', models.PositiveSmallIntegerField()),
-                ('sum_grand', models.PositiveSmallIntegerField()),
-                ('sum_trumph', models.PositiveSmallIntegerField()),
-                ('rating', models.DecimalField(blank=True, decimal_places=2, max_digits=6, null=True)),
-                ('match', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='mokstats.match')),
-                ('player', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='mokstats.player')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("sum_spades", models.PositiveSmallIntegerField()),
+                ("sum_queens", models.PositiveSmallIntegerField()),
+                ("sum_solitaire_lines", models.PositiveSmallIntegerField()),
+                ("sum_solitaire_cards", models.PositiveSmallIntegerField()),
+                ("sum_pass", models.PositiveSmallIntegerField()),
+                ("sum_grand", models.PositiveSmallIntegerField()),
+                ("sum_trumph", models.PositiveSmallIntegerField()),
+                ("rating", models.DecimalField(blank=True, decimal_places=2, max_digits=6, null=True)),
+                ("match", models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to="mokstats.match")),
+                ("player", models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to="mokstats.player")),
             ],
             options={
-                'unique_together': {('match', 'player')},
+                "unique_together": {("match", "player")},
             },
         ),
     ]

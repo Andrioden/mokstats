@@ -16,36 +16,144 @@ def test_match_get_position() -> None:
 
     # Arrange - Match 1
     match1 = Match.objects.create(date=datetime.datetime.now(), place=place)
-    PlayerResult.objects.create(sum_spades=0, match=match1, player=player1, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
-    PlayerResult.objects.create(sum_spades=0, match=match1, player=player2, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
-    PlayerResult.objects.create(sum_spades=0, match=match1, player=player3, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
+    PlayerResult.objects.create(
+        sum_spades=0,
+        match=match1,
+        player=player1,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
+    PlayerResult.objects.create(
+        sum_spades=0,
+        match=match1,
+        player=player2,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
+    PlayerResult.objects.create(
+        sum_spades=0,
+        match=match1,
+        player=player3,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
     # Arrange - Match 2
     match2 = Match.objects.create(date=datetime.datetime.now(), place=place)
-    PlayerResult.objects.create(sum_spades=1, match=match2, player=player1, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
-    PlayerResult.objects.create(sum_spades=0, match=match2, player=player2, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
-    PlayerResult.objects.create(sum_spades=0, match=match2, player=player3, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
+    PlayerResult.objects.create(
+        sum_spades=1,
+        match=match2,
+        player=player1,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
+    PlayerResult.objects.create(
+        sum_spades=0,
+        match=match2,
+        player=player2,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
+    PlayerResult.objects.create(
+        sum_spades=0,
+        match=match2,
+        player=player3,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
     # Arrange - Match 3
     match3 = Match.objects.create(date=datetime.datetime.now(), place=place)
-    PlayerResult.objects.create(sum_spades=1, match=match3, player=player1, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
-    PlayerResult.objects.create(sum_spades=1, match=match3, player=player2, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
-    PlayerResult.objects.create(sum_spades=0, match=match3, player=player3, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
+    PlayerResult.objects.create(
+        sum_spades=1,
+        match=match3,
+        player=player1,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
+    PlayerResult.objects.create(
+        sum_spades=1,
+        match=match3,
+        player=player2,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
+    PlayerResult.objects.create(
+        sum_spades=0,
+        match=match3,
+        player=player3,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
     # Arrange - Match 4
     match4 = Match.objects.create(date=datetime.datetime.now(), place=place)
-    PlayerResult.objects.create(sum_spades=11, match=match4, player=player1, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
-    PlayerResult.objects.create(sum_spades=22, match=match4, player=player2, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
-    PlayerResult.objects.create(sum_spades=33, match=match4, player=player3, sum_queens=0,
-                                sum_solitaire_lines=0, sum_solitaire_cards=0, sum_pass=0, sum_grand=0, sum_trumph=0)
+    PlayerResult.objects.create(
+        sum_spades=11,
+        match=match4,
+        player=player1,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
+    PlayerResult.objects.create(
+        sum_spades=22,
+        match=match4,
+        player=player2,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
+    PlayerResult.objects.create(
+        sum_spades=33,
+        match=match4,
+        player=player3,
+        sum_queens=0,
+        sum_solitaire_lines=0,
+        sum_solitaire_cards=0,
+        sum_pass=0,
+        sum_grand=0,
+        sum_trumph=0,
+    )
 
     # Assert - Match 1
     assert match1.get_position(player1.id) == 1
