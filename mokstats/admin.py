@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
 from mokstats.models import *
 from django.contrib import admin
 from django import forms
-from django.contrib.auth.models import User, Group
 
 
 class ResultInlineFormset(forms.models.BaseInlineFormSet):

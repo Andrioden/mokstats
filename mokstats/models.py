@@ -169,18 +169,18 @@ class PlayerResult(models.Model):
 
 
 # Has to use a method in between, cant reference cache.clear directly in connect() signals
-def clear_cache(sender, **kwargs):
+def clear_cache():
     cache.clear()
 
 
-def clear_affected_results_rating(instance, **kwargs):
+def clear_affected_results_rating(instance):
     newer = instance.get_newer_matches()
     newer_mids = list(newer.values_list('id', flat=True))
     affected_mids = newer_mids + [instance.id]
     PlayerResult.objects.filter(match_id__in=affected_mids).update(rating=None)
 
 
-def clear_all_rating(sender, **kwargs):
+def clear_all_rating():
     PlayerResult.objects.all().update(rating=None)
 
 
