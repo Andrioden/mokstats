@@ -56,7 +56,7 @@ class ResultInlineFormset(forms.models.BaseInlineFormSet):
                 "For få/mange spillere med 0 kort igjen i Kabal, %s nå, 1 krevd" % players_with_zero_solitaire_cards
             )
 
-        cards_per_player = 52 / player_count
+        cards_per_player = 52 // player_count
 
         if not pass_total == cards_per_player:
             raise forms.ValidationError(
