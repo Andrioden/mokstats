@@ -1,5 +1,5 @@
 import unittest
-from models import *
+from .models import *
 import datetime
 
 

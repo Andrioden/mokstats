@@ -1,7 +1,7 @@
 import unittest
 from decimal import Decimal
 
-from rating import RatingCalculator, RatingResult
+from .rating import RatingCalculator, RatingResult
 
 class TestRatingCalculator(unittest.TestCase):
     # NOTE: Tests will fail, currently only used to check differences. Assertequals not updated.

@@ -7,9 +7,9 @@ class MokstatsConfig(AppConfig):
     verbose_name = "Mokstats"
 
     def ready(self):
-        print 'Mokstats startup script - START'
+        print('Mokstats startup script - START')
 
-        print 'Creating cache table if it does not exist...'
+        print('Creating cache table if it does not exist...')
         call_command('createcachetable')
 
-        print 'Mokstats startup script - END'
+        print('Mokstats startup script - END')

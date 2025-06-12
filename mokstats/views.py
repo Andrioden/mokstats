@@ -3,8 +3,8 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.db.models import Max, Min, Avg, Count
-from models import Place, Player, PlayerResult, Match, cur_config
-from rating import RatingCalculator, RatingResult
+from .models import Place, Player, PlayerResult, Match, cur_config
+from .rating import RatingCalculator, RatingResult
 import calendar
 import os
 import json
@@ -150,7 +150,7 @@ def match(request, mid):
             'moffa_los': results[len(results) - 1]['player']['name'] == "Bengt",
             'moffa_win': (results[0]['player']['name'] == "Bengt") and (results[0]['total'] < 0),
             'aase_los': results[len(results) - 1]['player']['name'] == "Aase",
-            'andre_win': results[0]['player']['name'] == u"André"}
+            'andre_win': results[0]['player']['name'] == "André"}
     return render(request, 'match.html', data)
 
 
@@ -293,7 +293,7 @@ def activity(request):
     last_year = matches[len(matches) - 1].date.year
     for match in matches:
         place = match.place.name
-        if not data.has_key(place):
+        if place not in data:
             data[place] = {}
             for year in range(first_year, last_year + 1):
                 data[place][year] = {}
@@ -437,12 +437,12 @@ class TrumphStatser:
     def set_trumph_stats(self):
         match_sorted_results = {}
         for res in self.ALL_RESULTS.order_by('match'):
-            if not match_sorted_results.has_key(res.match_id):
+            if res.match_id not in match_sorted_results:
                 match_sorted_results[res.match_id] = []
             match_sorted_results[res.match_id].append(res)
 
         trump_sum_for_trumph_pickers = []
-        for match_results in match_sorted_results.itervalues():
+        for match_results in match_sorted_results.values():
             trumph_picker_player_result = self.get_trumph_picker_result_from_match_results(match_results)
 
             if trumph_picker_player_result == "IGNORE":

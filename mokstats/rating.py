@@ -1,5 +1,5 @@
 from decimal import Decimal
-from models import cur_config
+from .models import cur_config
 
 class RatingCalculator:
     def __init__(self):
@@ -36,7 +36,7 @@ class RatingCalculator:
         point_flux = self.K * 2 # Total amount of points in movement for 1 match
         points_parts = sum([i for i in range(len(player_rating_results))])
         points = []
-        for i in reversed(range(len(player_rating_results))):
+        for i in reversed(list(range(len(player_rating_results)))):
             points.append(Decimal(point_flux * i / points_parts)) # Postion to Point mapping
         # Check if someone has matching positions, then rework the mapping.
         sorted_positions = sorted([p.position for p in player_rating_results])
