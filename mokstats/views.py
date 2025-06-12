@@ -180,10 +180,9 @@ def stats(request):
     anywhere else.
 
     """
-    ALL_RESULTS = PlayerResult.objects.select_related()
-    PRS = PlayerResultStatser(ALL_RESULTS)
+    results = PlayerResult.objects.select_related()
+    prs = PlayerResultStatser(results)
 
-    # results_totals = ALL_RESULTS.extra(select={'total': '(sum_spades + sum_queens + sum_solitaire_lines + sum_solitaire_cards + sum_pass - sum_grand - sum_trumph)'})
     total_avg = round(
         sum(
             [
@@ -196,42 +195,42 @@ def stats(request):
                     - r.sum_grand
                     - r.sum_trumph
                 )
-                for r in ALL_RESULTS
+                for r in results
             ]
         )
-        / (ALL_RESULTS.count() * 1.0),
+        / (results.count() * 1.0),
         1,
     )
 
-    best_match_result = PRS.bot_total(1)[0]
-    worst_match_result = PRS.top_total(1)[0]
+    best_match_result = prs.bot_total(1)[0]
+    worst_match_result = prs.top_total(1)[0]
 
-    trumph_stats = TrumphStatser(ALL_RESULTS)
+    trumph_stats = TrumphStatser(results)
     match_count = Match.objects.count()
 
     data = {
-        "spades": {"worst": PRS.minmax(Max, "spades"), "gt0_average": PRS.gt0_avg("spades")},
-        "queens": {"worst": PRS.minmax(Max, "queens"), "gt0_average": PRS.gt0_avg("queens")},
-        "solitaire_lines": {"worst": PRS.minmax(Max, "solitaire_lines"), "gt0_average": PRS.gt0_avg("solitaire_lines")},
-        "solitaire_cards": {"worst": PRS.minmax(Max, "solitaire_cards"), "gt0_average": PRS.gt0_avg("solitaire_cards")},
+        "spades": {"worst": prs.minmax(Max, "spades"), "gt0_average": prs.gt0_avg("spades")},
+        "queens": {"worst": prs.minmax(Max, "queens"), "gt0_average": prs.gt0_avg("queens")},
+        "solitaire_lines": {"worst": prs.minmax(Max, "solitaire_lines"), "gt0_average": prs.gt0_avg("solitaire_lines")},
+        "solitaire_cards": {"worst": prs.minmax(Max, "solitaire_cards"), "gt0_average": prs.gt0_avg("solitaire_cards")},
         "solitaire_total": {
-            "worst": PRS.top(1, ["sum_solitaire_lines", "sum_solitaire_cards"])[0],
-            "average": PRS.avg("sum_solitaire_lines + sum_solitaire_cards"),
+            "worst": prs.top(1, ["sum_solitaire_lines", "sum_solitaire_cards"])[0],
+            "average": prs.avg("sum_solitaire_lines + sum_solitaire_cards"),
         },
-        "pass": {"worst": PRS.minmax(Max, "pass")},
-        "grand": {"best": PRS.minmax(Max, "grand")},
+        "pass": {"worst": prs.minmax(Max, "pass")},
+        "grand": {"best": prs.minmax(Max, "grand")},
         "trumph": {
-            "best": PRS.minmax(Max, "trumph"),
-            "average": PRS.avg("sum_trumph"),
+            "best": prs.minmax(Max, "trumph"),
+            "average": prs.avg("sum_trumph"),
             "average_for_trumph_picker": round(trumph_stats.average_trumph_sum_for_trumph_pickers, 1),
             "saved_count": trumph_stats.matches_trumph_picker_not_lost,
             "saved_percent": round(trumph_stats.matches_trumph_picker_not_lost * 100 / float(match_count), 1),
         },
         "extremes": {
-            "gain": PRS.top(1, ["sum_spades", "sum_queens", "sum_solitaire_lines", "sum_solitaire_cards", "sum_pass"])[
+            "gain": prs.top(1, ["sum_spades", "sum_queens", "sum_solitaire_lines", "sum_solitaire_cards", "sum_pass"])[
                 0
             ],
-            "loss": PRS.bot(1, ["-sum_grand", "-sum_trumph"])[0],
+            "loss": prs.bot(1, ["-sum_grand", "-sum_trumph"])[0],
             "match_size": Match.objects.annotate(count=Count("playerresult"))
             .order_by("-count", "date", "id")
             .values("id", "count")[0],
@@ -244,15 +243,15 @@ def stats(request):
 
 def stats_best_results(request):
     amount = int(request.GET.get("amount", 20))
-    PRS = PlayerResultStatser(PlayerResult.objects.select_related())
-    data = {"results": PRS.bot_total(amount), "title": "%s beste kampresultater" % amount}
+    prs = PlayerResultStatser(PlayerResult.objects.select_related())
+    data = {"results": prs.bot_total(amount), "title": "%s beste kampresultater" % amount}
     return render(request, "stats-result-list.html", data)
 
 
 def stats_worst_results(request):
     amount = int(request.GET.get("amount", 20))
-    PRS = PlayerResultStatser(PlayerResult.objects.select_related())
-    data = {"results": PRS.top_total(amount), "title": "%s dårligste kampresultater" % amount}
+    prs = PlayerResultStatser(PlayerResult.objects.select_related())
+    data = {"results": prs.top_total(amount), "title": "%s dårligste kampresultater" % amount}
     return render(request, "stats-result-list.html", data)
 
 
@@ -264,8 +263,8 @@ def stats_top_rounds(request):
         round_value_fields = ["sum_solitaire_lines", "sum_solitaire_cards"]
     else:
         round_value_fields = ["sum_%s" % round_type]
-    PRS = PlayerResultStatser(PlayerResult.objects.select_related())
-    data = {"results": PRS.top(amount, round_value_fields), "title": "%s toppresultater for %s " % (amount, round_type)}
+    prs = PlayerResultStatser(PlayerResult.objects.select_related())
+    data = {"results": prs.top(amount, round_value_fields), "title": "%s toppresultater for %s " % (amount, round_type)}
     return render(request, "stats-result-list.html", data)
 
 
@@ -464,7 +463,7 @@ class PlayerResultStatser:
 
     def top(self, max_results, fields, reverse=True):
         """
-        fields should be in the following format with a prefix that indicates if it is added or subtracted to the sum used to determine if its sort value:
+        Use format with a prefix to indicate if added or subtracted to the sum used to determine if its sort value:
         [
             "[prefix]<fieldname>",
         ]
@@ -572,7 +571,7 @@ class TrumphStatser:
 
 def _get_size(start_path="."):
     total_size = 0
-    for dirpath, dirnames, filenames in os.walk(start_path):
+    for dirpath, _, filenames in os.walk(start_path):
         for f in filenames:
             fp = os.path.join(dirpath, f)
             total_size += os.path.getsize(fp)

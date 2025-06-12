@@ -107,12 +107,12 @@ class Match(models.Model):
         # print 'PlayerResult for player %s not found in match %s' % (pid, self.pk)
 
     def get_newer_matches(self):
-        excludeQ = Q(date__lt=self.date) | (Q(date=self.date) & Q(id__lte=self.pk))
-        return Match.objects.exclude(excludeQ)
+        exclude_q = Q(date__lt=self.date) | (Q(date=self.date) & Q(id__lte=self.pk))
+        return Match.objects.exclude(exclude_q)
 
     def get_older_matches(self):
-        excludeQ = Q(date__gt=self.date) | (Q(date=self.date) & Q(id__gte=self.pk))
-        return Match.objects.exclude(excludeQ)
+        exclude_q = Q(date__gt=self.date) | (Q(date=self.date) & Q(id__gte=self.pk))
+        return Match.objects.exclude(exclude_q)
 
     def get_next_match_id(self):
         newer = self.get_newer_matches()

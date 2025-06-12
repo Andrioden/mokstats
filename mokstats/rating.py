@@ -21,7 +21,6 @@ class RatingCalculator:
             expected_points = total_points * win_chance
             actual_points = points_for_position[p.position - 1]
             p.rating += self.K * (actual_points - expected_points)
-            # print "(%s) %s - Win chance of %s and position %s, gives expected/actual points of %s/%s and %s as new rating " % (p.dbid, round(from_rating,2), round(win_chance,2), p.position, round(expected_points,2), actual_points, round(p.rating,2))
         return player_rating_results
 
     def points_for_position(self, player_rating_results):
@@ -37,7 +36,7 @@ class RatingCalculator:
         # Change this part if the balance between position, player count and points awarded
         # needs to be changed.
         point_flux = self.K * 2  # Total amount of points in movement for 1 match
-        points_parts = sum([i for i in range(len(player_rating_results))])
+        points_parts = sum(i for i in range(len(player_rating_results)))
         points = []
         for i in reversed(list(range(len(player_rating_results)))):
             points.append(Decimal(point_flux * i / points_parts))  # Postion to Point mapping
