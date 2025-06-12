@@ -1,56 +1,16 @@
 import os
 
+from .config import config
+
 """ PART: Settings that are unique for each environment
 ********************************************************
 """
 
-DEBUG = True
-ALLOWED_HOSTS = ["*"]
-# DATABASES = {"default": config.database}
-SECRET_KEY = "asd"
+DEBUG = config.debug
+ALLOWED_HOSTS = config.allowed_hosts
+DATABASES = {"default": config.database}
+SECRET_KEY = config.secret_key
 
-
-# Database settings
-if os.getenv("SERVER_SOFTWARE", "").startswith("Google App Engine"):
-    # Running on production App Engine, so connect to Google Cloud SQL using
-    # the unix socket at /cloudsql/<your-cloudsql-connection string>
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "HOST": "??",
-            "NAME": "mokstats",
-            "USER": "??",
-            "PASSWORD": "??",
-        }
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.postgresql"),
-            "HOST": os.environ.get("DB_HOST", "localhost"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
-            "NAME": os.environ.get("DB_NAME", "mokstats"),
-            "USER": os.environ.get("DB_USER", "mokstats"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", "mokstats"),
-        }
-    }
-    # Running locally so connect to either a local MySQL instance or connect to
-    # Cloud SQL via the proxy. To start the proxy via command line:
-    #
-    #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
-    #
-    # See https://cloud.google.com/sql/docs/mysql-connect-proxy
-    # if DEV_USE_LOCAL_PROD_DB_PROXY:
-    #     DATABASES = {
-    #         'default': {
-    #             'ENGINE': 'django.db.backends.mysql',
-    #             'HOST': '127.0.0.1',
-    #             'PORT': '3307',
-    #             'NAME': 'mokstats',
-    #             'USER': '??',
-    #             'PASSWORD': '??',
-    #         }
-    #     }
 
 """ PART: General settings
 ********************************************************

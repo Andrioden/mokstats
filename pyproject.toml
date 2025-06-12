@@ -6,7 +6,7 @@ python = "^3.13"
 gunicorn = "*"
 psycopg = { extras = ["binary", "pool"], version = "*" }
 django = "==5.2.2"
-#google-cloud-secret-manager = "*"
+google-cloud-secret-manager = "*"
 
 [tool.poetry.group.dev.dependencies]
 vulture = "*"

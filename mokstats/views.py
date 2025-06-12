@@ -6,7 +6,7 @@ from django.db.models import Avg, Count, Max, Min, QuerySet
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from .config import ACTIVE_PLAYER_MATCH_THRESHOLD, RATING_K, RATING_START
+from .config import config
 from .models import Match, Place, Player, PlayerResult
 from .rating import RatingCalculator, RatingResult
 from .utils import month_name, month_number_padded
@@ -71,7 +71,7 @@ def players(request: WSGIRequest) -> HttpResponse:
         p = {"name": place.name}
         p["selected"] = "selected" if (place.id in place_ids) else ""
         places.append(p)
-    data = {"players": players, "places": places, "config": {"active_treshold": ACTIVE_PLAYER_MATCH_THRESHOLD}}
+    data = {"players": players, "places": places, "config": {"active_treshold": config.ACTIVE_PLAYER_MATCH_THRESHOLD}}
 
     return render(request, "players.html", data)
 
@@ -308,7 +308,7 @@ def rating(request: WSGIRequest) -> HttpResponse:
     active_players = []
     players = Player.objects.all()
     for p in players:
-        if PlayerResult.objects.filter(player_id=p.id).count() >= ACTIVE_PLAYER_MATCH_THRESHOLD:
+        if PlayerResult.objects.filter(player_id=p.id).count() >= config.ACTIVE_PLAYER_MATCH_THRESHOLD:
             active_players.append(p)
     # Create data context and return response
     data = {
@@ -331,7 +331,7 @@ def rating(request: WSGIRequest) -> HttpResponse:
 
 
 def rating_description(request: WSGIRequest) -> HttpResponse:
-    data = {"K_VALUE": int(RATING_K), "START_RATING": int(RATING_START)}
+    data = {"K_VALUE": int(config.RATING_K), "START_RATING": int(config.RATING_START)}
     return render(request, "rating-description.html", data)
 
 
@@ -383,7 +383,7 @@ def _update_ratings() -> None:
                 PlayerResult.objects.filter(player=pp["id"]).exclude(rating=None).order_by("-match__date", "-match__id")
             )
             if not rated_results.exists():
-                rating = RATING_START
+                rating = config.RATING_START
             else:
                 rating = rated_results[0].rating  # type: ignore[assignment]
             rating_results.append(RatingResult(pp["id"], rating, pp["position"]))

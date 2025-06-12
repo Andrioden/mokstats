@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import CASCADE, PROTECT, Q, QuerySet
 from django.db.models.signals import post_delete, post_save
 
-from .config import RATING_START
+from .config import config
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class Player(models.Model):
     def get_ratings(self) -> list[list]:
         results = PlayerResult.objects.filter(player=self).select_related("match")
         ratings = []
-        prev_rating = RATING_START
+        prev_rating = config.RATING_START
         for res in results.order_by("match__date", "match__id"):
             dif = res.rating - prev_rating  # type: ignore[operator]
             if dif > 0:
@@ -160,7 +160,7 @@ class PlayerResult(models.Model):
                 raise ValueError(f"Previous rating is None for {self.player.name=} in {self.match.id=}")
             return self.rating - previous_rating
         else:
-            return self.rating - RATING_START
+            return self.rating - config.RATING_START
 
     def vals(self) -> dict:
         return {

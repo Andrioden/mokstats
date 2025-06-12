@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from .config import RATING_K
+from .config import config
 
 
 @dataclass
@@ -13,7 +13,7 @@ class RatingResult:
 
 class RatingCalculator:
     def __init__(self) -> None:
-        self.K = RATING_K
+        self.K = config.RATING_K
 
     def new_ratings(self, player_rating_results: list[RatingResult]) -> list[RatingResult]:
         total_rating = sum([p.rating for p in player_rating_results])
