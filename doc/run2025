@@ -6,3 +6,9 @@ docker run --name mokstats-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mokstats -e
 
 
 docker run --name mokstats-postgres -p 5432:5432 -e POSTGRES_USER=mokstats -e POSTGRES_PASSWORD=mokstats -e POSTGRES_DB=mokstats -d postgres:17
+
+
+**Make an admin**
+
+1. `python manage.py createsuperuser --username admin --email foo@foo.foo`
+2. Test it by going to http://127.0.0.1:8000/admin

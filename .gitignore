@@ -8,7 +8,6 @@ settings.py
 /env
 /lib
 .idea
-/mokstats/migrations
 
 #################
 ## Eclipse
