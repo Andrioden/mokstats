@@ -2,6 +2,8 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from django.contrib import admin
+from django.urls import path
+
 admin.autodiscover()
 
 """ Hide some admin panel models """
@@ -12,24 +14,24 @@ from mokstats import views, ajax
 
 """ LIST OF PATTERNS """
 urlpatterns = [
-    url(r'^$', views.index),
-    url(r'^players/(?P<pid>\d+)/$', views.player),
-    url(r'^players/$', views.players),
-    url(r'^matches/(?P<mid>\d+)/$', views.match),
-    url(r'^matches/$', views.matches),
-    url(r'^stats/$', views.stats),
-    url(r'^stats/best-results/$', views.stats_best_results),
-    url(r'^stats/worst-results/$', views.stats_worst_results),
-    url(r'^stats/top-rounds/$', views.stats_top_rounds),
-    url(r'^stats/biggest-match-sizes/$', views.stats_biggest_match_sizes),
-    url(r'^rating/$', views.rating),
-    url(r'^rating/description/$', views.rating_description),
-    url(r'^activity/$', views.activity),
+    path('', views.index),
+    path('players/<int:pid>/', views.player),
+    path('players/', views.players),
+    path('matches/<int:mid>/', views.match),
+    path('matches/', views.matches),
+    path('stats/', views.stats),
+    path('stats/best-results/', views.stats_best_results),
+    path('stats/worst-results/', views.stats_worst_results),
+    path('stats/top-rounds/', views.stats_top_rounds),
+    path('stats/biggest-match-sizes/', views.stats_biggest_match_sizes),
+    path('rating/', views.rating),
+    path('rating/description/', views.rating_description),
+    path('activity/', views.activity),
     # AJAX CALLS
-    url(r'^ajax/last_playerlist/$', ajax.last_playerlist),
-    url(r'^ajax/clear_cache/$', ajax.clear_cache),
+    path('ajax/last_playerlist/', ajax.last_playerlist),
+    path('ajax/clear_cache/', ajax.clear_cache),
     # ADMIN PAGES
-    url(r'^admin/', include(admin.site.urls)),
+    path('admin/', include(admin.site.urls)),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
