@@ -4,7 +4,7 @@ import logging
 from django.db import models
 from django.db.models import PROTECT, Q
 
-from mokstats.config import RATING_START
+from .config import RATING_START
 
 logger = logging.getLogger(__name__)
 

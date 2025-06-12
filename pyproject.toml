@@ -21,7 +21,6 @@ pep8-naming = "*"
 mypy = "*"
 pytest = "*"
 pytest-django = "*"
-#pytest-mock = "*"
 django-stubs = "==5.2.0"
 
 [tool.vulture]
