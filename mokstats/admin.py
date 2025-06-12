@@ -1,6 +1,7 @@
-from mokstats.models import *
-from django.contrib import admin
 from django import forms
+from django.contrib import admin
+
+from mokstats.models import Match, Place, Player, PlayerResult
 
 
 class ResultInlineFormset(forms.models.BaseInlineFormSet):

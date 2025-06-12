@@ -1,13 +1,14 @@
-from django.shortcuts import render, get_object_or_404
-from django.db.models import Max, Min, Avg, Count
+import calendar
+import json
+import os
+from operator import itemgetter
+
+from django.db.models import Avg, Count, Max, Min
+from django.shortcuts import get_object_or_404, render
 
 from .config import ACTIVE_PLAYER_MATCH_THRESHOLD, RATING_K, RATING_START
-from .models import Place, Player, PlayerResult, Match
+from .models import Match, Place, Player, PlayerResult
 from .rating import RatingCalculator, RatingResult
-import calendar
-import os
-import json
-from operator import itemgetter
 
 
 def index(request):

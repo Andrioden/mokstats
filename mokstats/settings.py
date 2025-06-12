@@ -1,6 +1,5 @@
 import os
 
-
 """ PART: Settings that are unique for each environment
 ********************************************************
 """

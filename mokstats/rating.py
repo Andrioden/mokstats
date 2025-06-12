@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from .config import RATING_K
 
+
 class RatingCalculator:
     def __init__(self):
         self.K = RATING_K

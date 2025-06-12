@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from mokstats.models import Place, Player, Match, PlayerResult
+from mokstats.models import Match, Place, Player, PlayerResult
 
 
 @pytest.mark.django_db

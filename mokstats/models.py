@@ -1,11 +1,10 @@
-from django.db import models
-from django.db.models import Q, PROTECT
-from django.db.models.signals import post_save, post_delete
-from django.core.cache import cache
-
 import datetime
-
 import logging
+
+from django.core.cache import cache
+from django.db import models
+from django.db.models import PROTECT, Q
+from django.db.models.signals import post_delete, post_save
 
 from mokstats.config import RATING_START
 
