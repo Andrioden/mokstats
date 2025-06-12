@@ -6,7 +6,7 @@ from mokstats.models import Place, Player, Match, PlayerResult
 
 
 @pytest.mark.django_db
-def test_db_match_get_position() -> None:
+def test_match_get_position() -> None:
     # Arrange - Place/Player
     place = Place.objects.create(name="Lolplace")
 
