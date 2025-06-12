@@ -5,7 +5,7 @@ from .models import Match, Place, Player, PlayerResult
 
 
 class ResultInlineFormset(forms.models.BaseInlineFormSet):
-    def clean(self):  # noqa: C901
+    def clean(self) -> None:  # noqa: C901
         # get forms that actually have valid data
         player_count = 0
         spades_total = 0

@@ -1,13 +1,21 @@
+from dataclasses import dataclass
 from decimal import Decimal
 
 from .config import RATING_K
 
 
+@dataclass
+class RatingResult:
+    player_id: int
+    rating: Decimal
+    position: int
+
+
 class RatingCalculator:
-    def __init__(self):
+    def __init__(self) -> None:
         self.K = RATING_K
 
-    def new_ratings(self, player_rating_results):
+    def new_ratings(self, player_rating_results: list[RatingResult]) -> list[RatingResult]:
         total_rating = sum([p.rating for p in player_rating_results])
         points_for_position = self.points_for_position(player_rating_results)
         total_points = sum(points_for_position)
@@ -23,7 +31,7 @@ class RatingCalculator:
             p.rating += self.K * (actual_points - expected_points)
         return player_rating_results
 
-    def points_for_position(self, player_rating_results):
+    def points_for_position(self, player_rating_results: list[RatingResult]) -> list[Decimal]:
         """Calculates how much each match positions awards in points, if
         no-one has the same position the for loop does nothing except adding
         and dividing again. The match position to point mapping works as following:
@@ -39,12 +47,12 @@ class RatingCalculator:
         points_parts = sum(i for i in range(len(player_rating_results)))
         points = []
         for i in reversed(list(range(len(player_rating_results)))):
-            points.append(Decimal(point_flux * i / points_parts))  # Postion to Point mapping
+            points.append(Decimal(point_flux * i / points_parts))  # Position to points mapping
         # Check if someone has matching positions, then rework the mapping.
         sorted_positions = sorted([p.position for p in player_rating_results])
         for y in range(len(sorted_positions)):
             ypos = sorted_positions[y]
-            shared_points = 0
+            shared_points = Decimal(0.0)
             shared_by = []
             # Find sharing positions
             for i in range(len(sorted_positions)):
@@ -58,14 +66,3 @@ class RatingCalculator:
             for sharer_pos in shared_by:
                 points[sharer_pos] = points_each
         return points
-
-
-class RatingResult:
-    dbid = None
-    rating = None
-    position = None
-
-    def __init__(self, dbid, rating, position):
-        self.dbid = dbid
-        self.rating = rating
-        self.position = position
