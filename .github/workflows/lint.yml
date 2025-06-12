@@ -1,0 +1,35 @@
+name: Lints and tests
+on:
+  push
+
+jobs:
+  python-lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "poetry"
+
+      - name: Install poetry env
+        run: poetry install
+
+      - name: Lints
+        run: |
+          poetry run vulture .
+          poetry run isort . --check --quiet
+          poetry run black . --check --quiet
+          poetry run flake8 .
+          poetry run mypy .
+
+      - name: Run tests
+        env:
+          DB_ENGINE: django.db.backends.sqlite3
+        run: poetry run pytest .
