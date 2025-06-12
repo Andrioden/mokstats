@@ -22,7 +22,7 @@ Legend
 2. Download project from GitHub
 	2.1. GitHub Profile SSH Key: https://help.github.com/articles/generating-ssh-keys
 	2.2. cd to django apps parent folder
-	2.3 "git clone git@github.com:Andrioden/MokStats.git"
+	2.3 "git clone git@github.com:Andrioden/mokstats.git"
 
 3. Setup Django Project
 	3.1. Settings
@@ -38,7 +38,7 @@ Legend
 		"mkdir -m 777 {PDIR}/static/CACHE/js"
 	3.4. Static Content
 		"python {PDIR}/manage.py collectstatic"
-		
+
 4. Setup PostgreSQL
 	4.1. Change postgres password: "sudo passwd postgres"
 	4.2. Create project database user: "sudo -u postgres createuser -P [dbuser]", No privliges
@@ -74,7 +74,7 @@ Legend
 	6.B. Restore database from backup/dump
 		- Get dump file
 		- "pg_restore -d mokstatsdb --role=mokstats [dumpfile]"
-		
+
 7. Setup Apache 2
 	7.1 Add and enable site
 		"touch /etc/apache2/sites-available/mokstats"
@@ -88,8 +88,8 @@ Legend
 		"a2enmod wsgi"
 	7.4 Apply changes
 		"service apache2 restart"
-	
-	
+
+
 Source guides this install document has been inspired by
 ----------------------------------------------------------------
 Guide 1 and 2 are loosely followed. Guide 3 and 4 are almost fully followed. 5 are modified and used.
