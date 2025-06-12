@@ -1,16 +1,11 @@
-from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from django.contrib import admin
 from django.urls import path
+from mokstats import views, ajax
 
 admin.autodiscover()
 
-""" Hide some admin panel models """
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
-
-from mokstats import views, ajax
 
 """ LIST OF PATTERNS """
 urlpatterns = [
@@ -31,7 +26,7 @@ urlpatterns = [
     path('ajax/last_playerlist/', ajax.last_playerlist),
     path('ajax/clear_cache/', ajax.clear_cache),
     # ADMIN PAGES
-    path('admin/', include(admin.site.urls)),
+    path("admin/", admin.site.urls),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

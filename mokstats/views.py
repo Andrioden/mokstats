@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render, render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.db.models import Max, Min, Avg, Count
 
 from .config import ACTIVE_PLAYER_MATCH_THRESHOLD, RATING_K, RATING_START
@@ -256,7 +255,7 @@ def stats_biggest_match_sizes(request):
 def rating(request):
     _update_ratings()
     if PlayerResult.objects.count() == 0:
-        return render_to_response('rating.html', {}, context_instance=RequestContext(request))
+        return render(request, 'rating.html', {})
     max_rating = PlayerResult.objects.aggregate(Max('rating'))['rating__max']
     max_obj = PlayerResult.objects.select_related('player').filter(rating=max_rating).order_by('match__date', 'match__id')[0]
     min_rating = PlayerResult.objects.aggregate(Min('rating'))['rating__min']
