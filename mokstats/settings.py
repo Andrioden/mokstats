@@ -46,6 +46,8 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
+    # Site wide Cache (https://docs.djangoproject.com/en/1.11/topics/cache/#the-per-site-cache)
+    "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -53,8 +55,6 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # Site wide Cache (https://docs.djangoproject.com/en/1.11/topics/cache/#the-per-site-cache)
-    "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
 )
 
@@ -78,12 +78,10 @@ TEMPLATES = [
     },
 ]
 
-# CACHE_SECONDS = 60*60*24*365 # 1 year
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-#         'LOCATION': 'site_cache',
-#         'TIMEOUT': CACHE_SECONDS,
-#     }
-# }
-# CACHE_MIDDLEWARE_SECONDS = CACHE_SECONDS
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "site_cache",
+    }
+}
+CACHE_MIDDLEWARE_SECONDS = 60 * 60 * 24 * 365  # 1 year

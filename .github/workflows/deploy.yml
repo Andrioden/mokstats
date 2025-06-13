@@ -56,7 +56,7 @@ jobs:
           echo '${{secrets.GCLOUD_CREDENTIALS}}' > secrets.json
           ./cloud-sql-proxy mokstats:europe-west1:mokstats-prod --credentials-file secrets.json &
 
-      - name: Migrate database, ensure superuser
+      - name: Migrate database, clear cache, ensure superuser
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 5432
@@ -66,6 +66,8 @@ jobs:
           DJANGO_SUPERUSER_PASSWORD: ${{secrets.DJANGO_SUPERUSER_PASSWORD}}
         run: |
           poetry run python manage.py migrate
+          poetry run python manage.py createcachetable
+          poetry run python manage.py clearcache
           poetry run python manage.py createsuperuser --username andre --email andre.okul@gmail.com --no-input || true
 
       # Clean up (source: https://stackoverflow.com/a/66911696/686131)

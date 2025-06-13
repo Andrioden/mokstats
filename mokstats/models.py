@@ -3,6 +3,7 @@ import logging
 from decimal import Decimal
 from typing import Any, Literal
 
+from django.core.cache import cache
 from django.db import models
 from django.db.models import CASCADE, PROTECT, Q, QuerySet
 from django.db.models.signals import post_delete, post_save
@@ -207,12 +208,25 @@ class PlayerResult(models.Model):
         unique_together = ("match", "player")
 
 
-def clear_affected_results_rating(instance: Match, **kwargs: Any) -> None:  # noqa: F841
+def clear_affected_matches_results_rating(instance: Match, **kwargs: Any) -> None:  # noqa: F841
     newer = instance.get_newer_matches()
     newer_mids = list(newer.values_list("id", flat=True))
     affected_mids = newer_mids + [instance.id]
     PlayerResult.objects.filter(match_id__in=affected_mids).update(rating=None)
 
 
-post_save.connect(clear_affected_results_rating, sender=Match)
-post_delete.connect(clear_affected_results_rating, sender=Match)
+def clear_cache(sender: Player | Place | Match, **kwargs: Any) -> None:  # noqa: F841
+    cache.clear()
+
+
+post_save.connect(clear_affected_matches_results_rating, sender=Match)
+post_delete.connect(clear_affected_matches_results_rating, sender=Match)
+
+post_save.connect(clear_cache, sender=Player)
+post_delete.connect(clear_cache, sender=Player)
+
+post_save.connect(clear_cache, sender=Place)
+post_delete.connect(clear_cache, sender=Place)
+
+post_save.connect(clear_cache, sender=Match)
+post_delete.connect(clear_cache, sender=Match)
