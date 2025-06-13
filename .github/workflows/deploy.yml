@@ -54,7 +54,7 @@ jobs:
           curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.17.1/cloud-sql-proxy.linux.amd64
           chmod +x cloud-sql-proxy
           echo '${{secrets.GCLOUD_CREDENTIALS}}' > secrets.json
-          ./cloud-sql-proxy mokstats:europe-west1:mokstats-prod -credential_file secrets.json &
+          ./cloud-sql-proxy mokstats:europe-west1:mokstats-prod -credentials-file secrets.json &
 
       - name: Migrate database, ensure superuser
         env:
