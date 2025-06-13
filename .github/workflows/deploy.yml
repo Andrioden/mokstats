@@ -56,7 +56,7 @@ jobs:
           echo '${{secrets.GCLOUD_CREDENTIALS}}' > secrets.json
           ./cloud_sql_proxy -instances=mokstats:europe-west1:mokstats-prod=tcp:5432 -credential_file secrets.json &
 
-      - name: Migrate database, ensure superuser, populate content
+      - name: Migrate database, ensure superuser
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 5432
@@ -67,7 +67,6 @@ jobs:
         run: |
           poetry run python manage.py migrate
           poetry run python manage.py createsuperuser --username andre --email andre.okul@gmail.com --no-input || true
-          poetry run python cli.py populate
 
       # Clean up (source: https://stackoverflow.com/a/66911696/686131)
       - name: Delete old app engine versions
