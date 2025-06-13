@@ -51,10 +51,10 @@ jobs:
       # Database interaction
       - name: Start Cloud SQL Proxy
         run: |
-          wget -nv https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-          chmod +x cloud_sql_proxy
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.17.1/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
           echo '${{secrets.GCLOUD_CREDENTIALS}}' > secrets.json
-          ./cloud_sql_proxy -instances=mokstats:europe-west1:mokstats-prod=tcp:5432 -credential_file secrets.json &
+          ./cloud-sql-proxy mokstats:europe-west1:mokstats-prod -credential_file secrets.json &
 
       - name: Migrate database, ensure superuser
         env:
