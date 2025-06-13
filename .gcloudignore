@@ -1,7 +1,6 @@
 # Root
 /.github/
 /.git/
-/doc/
 /app.prod.yaml
 /.gcloudignore
 /.gitattributes
