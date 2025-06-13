@@ -42,8 +42,8 @@ jobs:
 
       - name: Generate requirements.txt
         run: |
-          poetry export --without-hashes --format requirements.txt --output ../requirements.txt
-          cat ../requirements.txt
+          poetry export --without-hashes --format requirements.txt --output requirements.txt
+          cat requirements.txt
 
       - name: Deploy to gcloud
         run: gcloud app deploy app.prod.yaml
