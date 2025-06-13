@@ -1,6 +1,6 @@
 import json
-from decimal import Decimal
 import os
+from decimal import Decimal
 from typing import List
 
 from google.cloud.secretmanager import SecretManagerServiceClient
