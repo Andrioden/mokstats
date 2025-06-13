@@ -1,12 +1,12 @@
 #!/bin/sh
 
-# UNIT TESTS
-if pytest -m unittest --quiet ; then
-    echo "python unit tests ok!"
-else
-    echo "python unit tests failed!"
-    exit 1
-fi
+# UNIT TESTS (Disabled, no unittests atm)
+#if pytest . -m unittest --quiet ; then
+#    echo "python unit tests ok!"
+#else
+#    echo "python unit tests failed!"
+#    exit 1
+#fi
 
 # VULTURE
 if vulture . ; then
