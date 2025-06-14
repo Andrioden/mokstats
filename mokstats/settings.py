@@ -46,7 +46,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
-    # Site wide Cache (https://docs.djangoproject.com/en/1.11/topics/cache/#the-per-site-cache)
+    # Site wide Cache (https://docs.djangoproject.com/en/5.2/topics/cache/#the-per-site-cache)
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
