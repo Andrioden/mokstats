@@ -1,12 +1,12 @@
 # Root
 /.github/
 /.git/
-/app.prod.yaml
 /.gcloudignore
 /.gitattributes
-/README.md
-/pre-commit.sh
 /.gitignore
+/README.md
+/app.prod.yaml
+/pre-commit.sh
 /lints.ps1
 
 # App
