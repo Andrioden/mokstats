@@ -2,13 +2,11 @@
 ## Custom
 #################
 
-settings.py
 /logs
 /static
 /env
 /lib
 .idea
-/mokstats/migrations
 
 #################
 ## Eclipse

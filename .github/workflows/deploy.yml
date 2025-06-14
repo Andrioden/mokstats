@@ -1,5 +1,6 @@
+name: Deploy
 on:
-  workflow_dispatch:
+  workflow_dispatch
 
 jobs:
   deploy:
@@ -20,14 +21,14 @@ jobs:
           project_id: mokstats
 
       # Setup python environment
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
           cache: "poetry"
-
-      - name: Install pipenv
-        run: pip install pipenv
 
       - name: Install poetry env
         run: poetry install
@@ -37,24 +38,25 @@ jobs:
 
       # Deploy
       - name: Collectstatic
-        run: pipenv run python manage.py collectstatic --noinput
+        run: poetry run python manage.py collectstatic --noinput
 
       - name: Generate requirements.txt
         run: |
-          poetry export --without-hashes --format requirements.txt --output ../requirements.txt
-          cat ../requirements.txt
+          poetry export --without-hashes --format requirements.txt --output requirements.txt
+          cat requirements.txt
+
       - name: Deploy to gcloud
         run: gcloud app deploy app.prod.yaml
 
       # Database interaction
       - name: Start Cloud SQL Proxy
         run: |
-          wget -nv https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-          chmod +x cloud_sql_proxy
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.17.1/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
           echo '${{secrets.GCLOUD_CREDENTIALS}}' > secrets.json
-          ./cloud_sql_proxy -instances=mokstats:europe-west1:mokstats-prod=tcp:5432 -credential_file secrets.json &
-      - name: Migrate database, ensure superuser, populate content
-        working-directory: backend
+          ./cloud-sql-proxy mokstats:europe-west1:mokstats-prod --credentials-file secrets.json &
+
+      - name: Migrate database, clear cache, ensure superuser
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 5432
@@ -63,9 +65,11 @@ jobs:
           DB_PASSWORD: ${{secrets.GCLOUD_PROD_DB_PASSWORD}}
           DJANGO_SUPERUSER_PASSWORD: ${{secrets.DJANGO_SUPERUSER_PASSWORD}}
         run: |
-          pipenv run python manage.py migrate
-          pipenv run python manage.py createsuperuser --username andre --email andre.okul@gmail.com --no-input || true
-          pipenv run python cli.py populate
+          poetry run python manage.py migrate
+          poetry run python manage.py createcachetable
+          poetry run python manage.py clearcache
+          poetry run python manage.py createsuperuser --username andre --email andre.okul@gmail.com --no-input || true
+
       # Clean up (source: https://stackoverflow.com/a/66911696/686131)
       - name: Delete old app engine versions
         run: gcloud app versions list --service default --format="value(version.id)" --sort-by="~version.createTime" | tail -n +6 | xargs -r gcloud app versions delete --quiet

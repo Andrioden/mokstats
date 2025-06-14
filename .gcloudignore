@@ -1,0 +1,30 @@
+# Root
+/.github/
+/.git/
+/.gcloudignore
+/.gitattributes
+/.gitignore
+/README.md
+/app.prod.yaml
+/pre-commit.sh
+/lints.ps1
+
+# App
+/tests/
+/**/migrations/
+/poetry.lock
+/pyproject.toml
+/gimp/
+
+# Static files that are to be collected, but not directly deployed
+/mokstats/static/
+
+# Caches
+.mypy_cache
+.pytest_cache
+.idea/
+.dmypy.json
+*.pyc
+
+# GitHub deploy
+gha-creds-*
