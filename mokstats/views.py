@@ -192,6 +192,14 @@ def stats(request: WSGIRequest) -> HttpResponse:
             "gt0_average": prs.gt0_avg("queens"),
         },
         "solitaire": {
+            "lines_lowest_total": {
+                "value": ms.solitaire_lines_lowest_total_value,
+                "mid": ms.solitaire_lines_lowest_total_match_id,
+            },
+            "lines_highest_total": {
+                "value": ms.solitaire_lines_highest_total_value,
+                "mid": ms.solitaire_lines_highest_total_match_id,
+            },
             "lines_worst": prs.max("solitaire_lines"),
             "lines_gt0_average": prs.gt0_avg("solitaire_lines"),
             "cards_worst": prs.max("solitaire_cards"),

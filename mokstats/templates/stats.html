@@ -40,7 +40,9 @@
 					<h3><span class="icon icon_solit_lines left"></span><span class="text left">Kabal</span></h3>
 					<p>
 						<ul>
-							<li>Høyeste antall strek i en <a href="../matches/{{solitaire.lines_worst.mid}}/">runde</a>: <a href="../players/{{solitaire.lines_worst.pid}}/">{{solitaire.lines_worst.pname}}</a> med {{solitaire.lines_worst.sum}} strek.</li>
+                            <li>Laveste totalt antall strek i en <a href="../matches/{{solitaire.lines_lowest_total.mid}}/">runde</a> er {{solitaire.lines_lowest_total.value}} strek.</li>
+					        <li>Høyeste totalt antall strek i en <a href="../matches/{{solitaire.lines_highest_total.mid}}/">runde</a> er {{solitaire.lines_highest_total.value}} strek.</li>
+                            <li>Høyeste antall strek i en <a href="../matches/{{solitaire.lines_worst.mid}}/">runde</a>: <a href="../players/{{solitaire.lines_worst.pid}}/">{{solitaire.lines_worst.pname}}</a> med {{solitaire.lines_worst.sum}} strek.</li>
 							<li>Gjennomsnitt av antal strek hvis man fikk en eller flere: {{solitaire.lines_gt0_average}} strek.</li>
 							<li>Høyeste antall kort igjen i en <a href="../matches/{{solitaire.cards_worst.mid}}/">runde</a>: <a href="../players/{{solitaire.cards_worst.pid}}/">{{solitaire.cards_worst.pname}}</a> med {{solitaire.cards_worst.sum}} kort.</li>
 							<li>Gjennomsnitt av antal kort hvis man satt igjen med et eller flere: {{solitaire.cards_gt0_average}} kort.</li>
