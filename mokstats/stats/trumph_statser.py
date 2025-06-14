@@ -24,7 +24,6 @@ class TrumphStatser:
             # Multiple trumph pickers in a match?
             if len(trumph_picker_candidates) > 1:
                 self.multiple_trumph_pickers += 1
-                print("multi", trumph_picker_candidates[0].match_id)
                 continue
             # Save sum for average calculation
             trump_sum_for_trumph_pickers.append(trumph_picker_candidates[0].sum_trumph)

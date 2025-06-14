@@ -64,6 +64,8 @@ class PlayerResultStatser:
 
     def top(self, max_results: int, fields: list[str], reverse: bool = True) -> list[dict]:
         """
+        Fields:
+
         Use format with a prefix to indicate if added or subtracted to the sum used to determine if its sort value:
         [
             "[prefix]<fieldname>",

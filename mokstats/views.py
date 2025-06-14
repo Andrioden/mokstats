@@ -179,49 +179,38 @@ def match(request: WSGIRequest, mid: int) -> HttpResponse:
 
 
 def stats(request: WSGIRequest) -> HttpResponse:
-    """This is the stats page that show all the stats that didnt fit
-    anywhere else.
-
-    """
     results = PlayerResult.objects.select_related()
     prs = PlayerResultStatser(results)
-
-    total_avg = round(
-        sum(
-            [
-                (
-                    r.sum_spades
-                    + r.sum_queens
-                    + r.sum_solitaire_lines
-                    + r.sum_solitaire_cards
-                    + r.sum_pass
-                    - r.sum_grand
-                    - r.sum_trumph
-                )
-                for r in results
-            ]
-        )
-        / (results.count() * 1.0),
-        1,
-    )
-
-    best_match_result = prs.bot_total(1)[0]
-    worst_match_result = prs.top_total(1)[0]
-
     trumph_stats = TrumphStatser(results)
     match_count = Match.objects.count()
 
     data = {
-        "spades": {"worst": prs.max("spades"), "gt0_average": prs.gt0_avg("spades")},
-        "queens": {"worst": prs.max("queens"), "gt0_average": prs.gt0_avg("queens")},
-        "solitaire_lines": {"worst": prs.max("solitaire_lines"), "gt0_average": prs.gt0_avg("solitaire_lines")},
-        "solitaire_cards": {"worst": prs.max("solitaire_cards"), "gt0_average": prs.gt0_avg("solitaire_cards")},
+        "spades": {
+            "worst": prs.max("spades"),
+            "gt0_average": prs.gt0_avg("spades"),
+        },
+        "queens": {
+            "worst": prs.max("queens"),
+            "gt0_average": prs.gt0_avg("queens"),
+        },
+        "solitaire_lines": {
+            "worst": prs.max("solitaire_lines"),
+            "gt0_average": prs.gt0_avg("solitaire_lines"),
+        },
+        "solitaire_cards": {
+            "worst": prs.max("solitaire_cards"),
+            "gt0_average": prs.gt0_avg("solitaire_cards"),
+        },
         "solitaire_total": {
             "worst": prs.top(1, ["sum_solitaire_lines", "sum_solitaire_cards"])[0],
             "average": prs.avg("sum_solitaire_lines + sum_solitaire_cards"),
         },
-        "pass": {"worst": prs.max("pass")},
-        "grand": {"best": prs.max("grand")},
+        "pass": {
+            "worst": prs.max("pass"),
+        },
+        "grand": {
+            "best": prs.max("grand"),
+        },
         "trumph": {
             "best": prs.max("trumph"),
             "average": prs.avg("sum_trumph"),
@@ -231,17 +220,22 @@ def stats(request: WSGIRequest) -> HttpResponse:
             "saved_count": trumph_stats.matches_trumph_picker_not_lost,
             "saved_percent": round(trumph_stats.matches_trumph_picker_not_lost * 100 / float(match_count), 1),
         },
-        "extremes": {
+        "total": {
+            "best": prs.bot_total(1)[0],
+            "worst": prs.top_total(1)[0],
+            "gt0_average": round(sum([r.total() for r in results]) / (results.count() * 1.0), 1),
+        },
+        "other": {
             "gain": prs.top(1, ["sum_spades", "sum_queens", "sum_solitaire_lines", "sum_solitaire_cards", "sum_pass"])[
                 0
             ],
             "loss": prs.bot(1, ["-sum_grand", "-sum_trumph"])[0],
-            "match_size": Match.objects.annotate(count=Count("playerresult"))
-            .order_by("-count", "date", "id")
-            .values("id", "count")[0],
+            "match_size": (
+                Match.objects.annotate(count=Count("playerresult"))
+                .order_by("-count", "date", "id")
+                .values("id", "count")[0]
+            ),
         },
-        "total": {"best": best_match_result, "worst": worst_match_result, "gt0_average": total_avg},
-        "match_count": match_count,
     }
     return render(request, "stats.html", data)
 
