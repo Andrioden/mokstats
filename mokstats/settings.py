@@ -81,6 +81,7 @@ TEMPLATES = [
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        # "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         "LOCATION": "site_cache",
     }
 }
