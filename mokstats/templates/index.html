@@ -1,21 +1,21 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 
 {% block title %}Forside{% endblock %}
 
 {% block content %}
 	<!-- Start of first page -->
 	<div data-role="page" id="index_page" data-dom-cache="true">
-	
+
 		<div data-role="header">
 			<h1>Møkkis statistikk</h1>
 		</div>
-		
+
 		<div data-role="content">
 			<a href="./players/" data-role="button">Spillere</a>
 			<a href="./matches/" data-role="button">Kamper</a>
 			<a href="./rating/" data-role="button">Rating</a>
 			<a href="./activity/" data-role="button">Aktivitet</a>
-			<a href="./stats/" data-role="button">Statistikk og Tall</a>
+			<a href="./stats/" data-role="button">Statistikk</a>
 		</div>
 		{% include "footer.html" %}
 	</div>
