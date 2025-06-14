@@ -19,58 +19,36 @@ class TrumphStatser:
 
         trump_sum_for_trumph_pickers = []
         for match_results in match_sorted_results.values():
-            trumph_picker_player_result = self._get_trumph_picker_result_from_match_results(match_results)
-
-            if trumph_picker_player_result is None:
+            trumph_picker_result = self._get_trumph_picker_result(match_results)
+            if trumph_picker_result is None:
                 continue
-            else:
-                # Average trumph picker sum list
-                trump_sum_for_trumph_pickers.append(trumph_picker_player_result.sum_trumph)
-                # Check if trumph picker avoided loss
-                match_loser_id = self._get_match_loser_id_from_match_results(match_results)
-                if match_loser_id is None:
-                    pass
-                elif trumph_picker_player_result.player_id != match_loser_id:
-                    self.matches_trumph_picker_not_lost += 1
+
+            # Average trumph picker sum list
+            trump_sum_for_trumph_pickers.append(trumph_picker_result.sum_trumph)
+            # Check if trumph picker avoided loss
+            loser_id = self._get_match_loser_id(match_results)
+            if loser_id is None:
+                continue
+            elif trumph_picker_result.player_id != loser_id:
+                print("trumf picker not loser", trumph_picker_result.match_id)
+                self.matches_trumph_picker_not_lost += 1
 
         self.avg_trumph_sum_for_trumph_pickers = sum(trump_sum_for_trumph_pickers) / len(trump_sum_for_trumph_pickers)
 
     @classmethod
-    def _get_trumph_picker_result_from_match_results(cls, match_results: list[PlayerResult]) -> PlayerResult | None:
-        highest_sum_before_trumph = -1000
-        has_multiple_trumphers = False
-        trumph_picker_player_result = None
-
-        for res in match_results:
-            total_before_trumph = res.total_before_trumph()
-            if total_before_trumph > highest_sum_before_trumph:
-                highest_sum_before_trumph = total_before_trumph
-                trumph_picker_player_result = res
-                has_multiple_trumphers = False
-            elif total_before_trumph == highest_sum_before_trumph:
-                has_multiple_trumphers = True
-
-        if has_multiple_trumphers:
-            return None
+    def _get_trumph_picker_result(cls, results: list[PlayerResult]) -> PlayerResult | None:
+        highest_sum_before_trumph = max(res.total_before_trumph() for res in results)
+        trump_pickers = [res for res in results if res.total_before_trumph() == highest_sum_before_trumph]
+        if len(trump_pickers) == 1:
+            return trump_pickers[0]
         else:
-            return trumph_picker_player_result
+            return None  # Ignore matches with multiple trumph pickers
 
     @classmethod
-    def _get_match_loser_id_from_match_results(cls, match_results: list[PlayerResult]) -> int | None:
-        highest_total_sum = -1000
-        has_multiple_losers = False
-        highest_player_result = None
-
-        for res in match_results:
-            total = res.total()
-            if total > highest_total_sum:
-                highest_total_sum = total
-                highest_player_result = res
-                has_multiple_losers = False
-            elif total == highest_total_sum:
-                has_multiple_losers = True
-
-        if has_multiple_losers:
-            return None
+    def _get_match_loser_id(cls, match_results: list[PlayerResult]) -> int | None:
+        highest_total_sum = max(res.total() for res in match_results)
+        loser_result = [res for res in match_results if res.total() == highest_total_sum]
+        if len(loser_result) == 1:
+            return loser_result[0].player_id
         else:
-            return highest_player_result.player_id  # type: ignore
+            return None  # Ignore matches with multiple trumph pickers
