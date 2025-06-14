@@ -6,6 +6,7 @@ from mokstats.models import PlayerResult
 class TrumphStatser:
     def __init__(self, all_results: QuerySet[PlayerResult]):
         self.all_results = all_results
+        self.multiple_trumph_pickers = 0
         self.matches_trumph_picker_not_lost = 0
         self.avg_trumph_sum_for_trumph_pickers = 0.0
         self.set_trumph_stats()
@@ -19,36 +20,29 @@ class TrumphStatser:
 
         trump_sum_for_trumph_pickers = []
         for match_results in match_sorted_results.values():
-            trumph_picker_result = self._get_trumph_picker_result(match_results)
-            if trumph_picker_result is None:
+            trumph_picker_candidates = self._get_trumph_picker_candidates(match_results)
+            # Multiple trumph pickers in a match?
+            if len(trumph_picker_candidates) > 1:
+                self.multiple_trumph_pickers += 1
+                print("multi", trumph_picker_candidates[0].match_id)
                 continue
-
-            # Average trumph picker sum list
-            trump_sum_for_trumph_pickers.append(trumph_picker_result.sum_trumph)
+            # Save sum for average calculation
+            trump_sum_for_trumph_pickers.append(trumph_picker_candidates[0].sum_trumph)
             # Check if trumph picker avoided loss
-            loser_id = self._get_match_loser_id(match_results)
-            if loser_id is None:
-                continue
-            elif trumph_picker_result.player_id != loser_id:
-                print("trumf picker not loser", trumph_picker_result.match_id)
+            loser_id = self._get_match_losers(match_results)
+            if len(loser_id) > 1:
+                continue  # Multiple losers, ignore this match
+            elif trumph_picker_candidates[0].player_id != loser_id[0].player_id:
                 self.matches_trumph_picker_not_lost += 1
 
         self.avg_trumph_sum_for_trumph_pickers = sum(trump_sum_for_trumph_pickers) / len(trump_sum_for_trumph_pickers)
 
     @classmethod
-    def _get_trumph_picker_result(cls, results: list[PlayerResult]) -> PlayerResult | None:
-        highest_sum_before_trumph = max(res.total_before_trumph() for res in results)
-        trump_pickers = [res for res in results if res.total_before_trumph() == highest_sum_before_trumph]
-        if len(trump_pickers) == 1:
-            return trump_pickers[0]
-        else:
-            return None  # Ignore matches with multiple trumph pickers
+    def _get_trumph_picker_candidates(cls, results: list[PlayerResult]) -> list[PlayerResult]:
+        highest_total_before_trumph = max(res.total_before_trumph() for res in results)
+        return [res for res in results if res.total_before_trumph() == highest_total_before_trumph]
 
     @classmethod
-    def _get_match_loser_id(cls, match_results: list[PlayerResult]) -> int | None:
-        highest_total_sum = max(res.total() for res in match_results)
-        loser_result = [res for res in match_results if res.total() == highest_total_sum]
-        if len(loser_result) == 1:
-            return loser_result[0].player_id
-        else:
-            return None  # Ignore matches with multiple trumph pickers
+    def _get_match_losers(cls, match_results: list[PlayerResult]) -> list[PlayerResult]:
+        highest_total = max(res.total() for res in match_results)
+        return [res for res in match_results if res.total() == highest_total]

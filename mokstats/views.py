@@ -226,6 +226,8 @@ def stats(request: WSGIRequest) -> HttpResponse:
             "best": prs.max("trumph"),
             "average": prs.avg("sum_trumph"),
             "average_for_trumph_picker": round(trumph_stats.avg_trumph_sum_for_trumph_pickers, 1),
+            "multiple_pickers": trumph_stats.multiple_trumph_pickers,
+            "multiple_pickers_percent": round(trumph_stats.multiple_trumph_pickers * 100 / float(match_count), 1),
             "saved_count": trumph_stats.matches_trumph_picker_not_lost,
             "saved_percent": round(trumph_stats.matches_trumph_picker_not_lost * 100 / float(match_count), 1),
         },
