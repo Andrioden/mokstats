@@ -222,9 +222,12 @@ def stats(request: WSGIRequest) -> HttpResponse:
             "gt0_average": round(sum([r.total() for r in results]) / (results.count() * 1.0), 1),
         },
         "other": {
-            "gain": prs.top(1, ["sum_spades", "sum_queens", "sum_solitaire_lines", "sum_solitaire_cards", "sum_pass"])[
-                0
-            ],
+            "gain_top": prs.top(
+                1, ["sum_spades", "sum_queens", "sum_solitaire_lines", "sum_solitaire_cards", "sum_pass"]
+            )[0],
+            "gain_bot": prs.bot(
+                1, ["sum_spades", "sum_queens", "sum_solitaire_lines", "sum_solitaire_cards", "sum_pass"]
+            )[0],
             "loss": prs.bot(1, ["-sum_grand", "-sum_trumph"])[0],
             "match_size": (
                 Match.objects.annotate(count=Count("playerresult"))

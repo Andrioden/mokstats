@@ -96,8 +96,9 @@
 					<h3>Annet</h3>
 					<p>
 						<ul>
-							<li>Høyeste antall poeng oppnådd før Grand er {{other.gain.sum}} av <a href="../players/{{other.gain.pid}}/">{{other.gain.pname}}</a> i <a href="../matches/{{other.gain.mid}}/">denne kampen.</a></li>
-							<li>Største reduksjon av poeng etter Grand er {{other.loss.sum}} av <a href="../players/{{other.loss.pid}}/">{{other.loss.pname}}</a> i <a href="../matches/{{other.loss.mid}}/">denne kampen.</a></li>
+							<li>Høyeste antall poeng oppnådd før Grand er {{other.gain_top.sum}} av <a href="../players/{{other.gain_top.pid}}/">{{other.gain_top.pname}}</a> i <a href="../matches/{{other.gain_top.mid}}/">denne kampen.</a></li>
+					        <li>Laveste antall poeng oppnådd før Grand er {{other.gain_bot.sum}} av <a href="../players/{{other.gain_bot.pid}}/">{{other.gain_bot.pname}}</a> i <a href="../matches/{{other.gain_bot.mid}}/">denne kampen.</a></li>
+                            <li>Største reduksjon av poeng etter Grand er {{other.loss.sum}} av <a href="../players/{{other.loss.pid}}/">{{other.loss.pname}}</a> i <a href="../matches/{{other.loss.mid}}/">denne kampen.</a></li>
 							<li>Flest spillere i en kamp er {{other.match_size.count}}, og skjedde først i <a href="../matches/{{other.match_size.id}}/">denne kampen</a>. Se <a href="./biggest-match-sizes/?amount=20">top20</a>.</li>
 						</ul>
 					</p>
