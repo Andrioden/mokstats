@@ -193,17 +193,13 @@ def stats(request: WSGIRequest) -> HttpResponse:
             "worst": prs.max("queens"),
             "gt0_average": prs.gt0_avg("queens"),
         },
-        "solitaire_lines": {
-            "worst": prs.max("solitaire_lines"),
-            "gt0_average": prs.gt0_avg("solitaire_lines"),
-        },
-        "solitaire_cards": {
-            "worst": prs.max("solitaire_cards"),
-            "gt0_average": prs.gt0_avg("solitaire_cards"),
-        },
-        "solitaire_total": {
-            "worst": prs.top(1, ["sum_solitaire_lines", "sum_solitaire_cards"])[0],
-            "average": prs.avg("sum_solitaire_lines + sum_solitaire_cards"),
+        "solitaire": {
+            "lines_worst": prs.max("solitaire_lines"),
+            "lines_gt0_average": prs.gt0_avg("solitaire_lines"),
+            "cards_worst": prs.max("solitaire_cards"),
+            "cards_gt0_average": prs.gt0_avg("solitaire_cards"),
+            "total_worst": prs.top(1, ["sum_solitaire_lines", "sum_solitaire_cards"])[0],
+            "total_average": prs.avg("sum_solitaire_lines + sum_solitaire_cards"),
         },
         "pass": {
             "worst": prs.max("pass"),
