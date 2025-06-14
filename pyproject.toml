@@ -4,7 +4,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.13"
 gunicorn = "*"
-psycopg = { extras = ["binary", "pool"], version = "*" }
+psycopg = { extras = ["binary"], version = "*" }
 django = "==5.2.2"
 google-cloud-secret-manager = "*"
 
