@@ -8,8 +8,8 @@ from django.shortcuts import get_object_or_404, render
 from .config import config
 from .models import Match, Place, Player, PlayerResult
 from .rating import RatingCalculator
+from .stats.match_statser import MatchStatser
 from .stats.player_result_statser import PlayerResultStatser
-from .stats.trumph_statser import TrumphStatser
 from .utils import month_name, month_number_padded
 
 
@@ -92,8 +92,8 @@ def player(request: WSGIRequest, pid: int) -> HttpResponse:
         elif position == PlayerResult.objects.filter(match=match).count():
             lost += 1
     # Round performance
-    all_calc = PlayerResultStatser(PlayerResult.objects.all())
-    player_calc = PlayerResultStatser(PlayerResult.objects.filter(player=player))
+    all_calc = PlayerResultStatser()
+    player_calc = PlayerResultStatser(player=player)
     round_perf = []
     for round_type in ["spades", "queens", "solitaire", "pass", "grand", "trumph"]:
         if round_type == "solitaire":
@@ -179,10 +179,8 @@ def match(request: WSGIRequest, mid: int) -> HttpResponse:
 
 
 def stats(request: WSGIRequest) -> HttpResponse:
-    results = PlayerResult.objects.select_related()
-    prs = PlayerResultStatser(results)
-    trumph_stats = TrumphStatser(results)
-    match_count = Match.objects.count()
+    prs = PlayerResultStatser()
+    ms = MatchStatser()
 
     data = {
         "spades": {
@@ -210,16 +208,16 @@ def stats(request: WSGIRequest) -> HttpResponse:
         "trumph": {
             "best": prs.max("trumph"),
             "average": prs.avg("sum_trumph"),
-            "average_for_trumph_picker": round(trumph_stats.avg_trumph_sum_for_trumph_pickers, 1),
-            "multiple_pickers": trumph_stats.multiple_trumph_pickers,
-            "multiple_pickers_percent": round(trumph_stats.multiple_trumph_pickers * 100 / float(match_count), 1),
-            "saved_count": trumph_stats.matches_trumph_picker_not_lost,
-            "saved_percent": round(trumph_stats.matches_trumph_picker_not_lost * 100 / float(match_count), 1),
+            "average_for_trumph_picker": round(ms.trumph_avg_total_for_trumph_pickers, 1),
+            "multiple_pickers": ms.trumph_multiple_pickers,
+            "multiple_pickers_percent": round(ms.trumph_multiple_pickers * 100 / float(ms.count), 1),
+            "saved_count": ms.trumph_matches_picker_not_lost,
+            "saved_percent": round(ms.trumph_matches_picker_not_lost * 100 / float(ms.count), 1),
         },
         "total": {
             "best": prs.bot_total(1)[0],
             "worst": prs.top_total(1)[0],
-            "gt0_average": round(sum([r.total() for r in results]) / (results.count() * 1.0), 1),
+            "average": ms.total_avg,
         },
         "other": {
             "gain_top": prs.top(
@@ -241,14 +239,14 @@ def stats(request: WSGIRequest) -> HttpResponse:
 
 def stats_best_results(request: WSGIRequest) -> HttpResponse:
     amount = int(request.GET.get("amount", 20))
-    prs = PlayerResultStatser(PlayerResult.objects.select_related())
+    prs = PlayerResultStatser()
     data = {"results": prs.bot_total(amount), "title": "%s beste kampresultater" % amount}
     return render(request, "stats-result-list.html", data)
 
 
 def stats_worst_results(request: WSGIRequest) -> HttpResponse:
     amount = int(request.GET.get("amount", 20))
-    prs = PlayerResultStatser(PlayerResult.objects.select_related())
+    prs = PlayerResultStatser()
     data = {"results": prs.top_total(amount), "title": "%s dårligste kampresultater" % amount}
     return render(request, "stats-result-list.html", data)
 
@@ -261,7 +259,7 @@ def stats_top_rounds(request: WSGIRequest) -> HttpResponse:
         round_value_fields = ["sum_solitaire_lines", "sum_solitaire_cards"]
     else:
         round_value_fields = ["sum_%s" % round_type]
-    prs = PlayerResultStatser(PlayerResult.objects.select_related())
+    prs = PlayerResultStatser()
     data = {"results": prs.top(amount, round_value_fields), "title": "%s toppresultater for %s " % (amount, round_type)}
     return render(request, "stats-result-list.html", data)
 
