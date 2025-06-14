@@ -1,0 +1,94 @@
+from _operator import itemgetter
+from django.db.models import Avg, Max, QuerySet
+
+from mokstats.models import PlayerResult
+
+
+class PlayerResultStatser:
+    """Does all kind of statistical fun fact calculations with the supplied PlayerResult object"""
+
+    def __init__(self, all_results: QuerySet[PlayerResult]) -> None:
+        self.all_results = all_results
+
+    def max(self, round_type: str) -> dict:
+        """Returns min or max value for a round type"""
+        field = f"sum_{round_type}"
+        val = self.all_results.aggregate(Max(field))[f"{field}__max"]
+        results = self.all_results.filter(**{field: val})
+        first = results.order_by("match__date", "match__id").select_related()[0]
+        return {"sum": val, "mid": first.match_id, "pid": first.player_id, "pname": first.player.name}
+
+    def avg(self, value_field_usage: str) -> float:
+        select_query = {"total": f"({value_field_usage})"}
+        average = 0.0
+        for res in self.all_results.extra(select=select_query):
+            average += res.total
+        return round(average / self.all_results.count(), 1)
+
+    def gt0_avg(self, round_type: str) -> float:
+        """Average score for the round type for results with greater than 0."""
+        field = f"sum_{round_type}"
+        result = self.all_results.filter(**{f"{field}__gt": 0}).aggregate(Avg(field))
+        return round(result[f"{field}__avg"], 1)  # type: ignore[no-any-return]
+
+    def top_total(self, amount: int) -> list[dict]:
+        return self.top(
+            amount,
+            [
+                "sum_spades",
+                "sum_queens",
+                "sum_solitaire_lines",
+                "sum_solitaire_cards",
+                "sum_pass",
+                "-sum_grand",
+                "-sum_trumph",
+            ],
+        )
+
+    def bot_total(self, amount: int) -> list[dict]:
+        return self.bot(
+            amount,
+            [
+                "sum_spades",
+                "sum_queens",
+                "sum_solitaire_lines",
+                "sum_solitaire_cards",
+                "sum_pass",
+                "-sum_grand",
+                "-sum_trumph",
+            ],
+        )
+
+    def bot(self, max_results: int, fields: list[str]) -> list[dict]:
+        return self.top(max_results, fields, False)
+
+    def top(self, max_results: int, fields: list[str], reverse: bool = True) -> list[dict]:
+        """
+        Use format with a prefix to indicate if added or subtracted to the sum used to determine if its sort value:
+        [
+            "[prefix]<fieldname>",
+        ]
+
+        Example:
+        [
+            "sum_spades",
+            "-sum_queens"
+        ]
+
+        """
+
+        summarized_results = []
+        for result in self.all_results:
+            sum = 0
+            for field in fields:
+                field_multiplicator = 1
+                if field[0] == "-":
+                    field = field[1:]
+                    field_multiplicator = -1
+                sum += getattr(result, field) * field_multiplicator
+
+            summarized_results.append(
+                {"sum": sum, "mid": result.match_id, "pid": result.player_id, "pname": result.player.name}
+            )
+
+        return sorted(summarized_results, key=itemgetter("sum"), reverse=reverse)[:max_results]

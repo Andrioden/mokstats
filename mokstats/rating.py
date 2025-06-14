@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from .config import config
+from .models import Match, PlayerResult
 
 
 @dataclass
@@ -13,9 +14,35 @@ class RatingResult:
 
 class RatingCalculator:
     @classmethod
-    def new_ratings(cls, player_rating_results: list[RatingResult]) -> list[RatingResult]:
+    def update_ratings(cls) -> None:
+        players = {}
+        match_ids = list(set(PlayerResult.objects.filter(rating=None).values_list("match_id", flat=True)))
+        for match in Match.objects.filter(id__in=match_ids).order_by("date", "id"):
+            player_positions = match.get_positions()
+            rating_results = []
+            for pp in player_positions:
+                # Fetch the current rating value
+                rated_results = (
+                    PlayerResult.objects.filter(player=pp["id"])
+                    .exclude(rating=None)
+                    .order_by("-match__date", "-match__id")
+                )
+                if not rated_results.exists():
+                    rating = config.RATING_START
+                else:
+                    rating = rated_results[0].rating  # type: ignore[assignment]
+                rating_results.append(RatingResult(pp["id"], rating, pp["position"]))
+            # Calculate new ratings
+            new_player_ratings = cls._new_ratings(rating_results)
+            # Update
+            for p in new_player_ratings:
+                players[p.player_id] = p.rating
+                PlayerResult.objects.filter(player=p.player_id).filter(match=match).update(rating=p.rating)
+
+    @classmethod
+    def _new_ratings(cls, player_rating_results: list[RatingResult]) -> list[RatingResult]:
         total_rating = sum([p.rating for p in player_rating_results])
-        points_for_position = cls.points_for_position(player_rating_results)
+        points_for_position = cls._points_for_position(player_rating_results)
         total_points = sum(points_for_position)
         # unsported_positions =
         # print total_rating
@@ -30,7 +57,7 @@ class RatingCalculator:
         return player_rating_results
 
     @classmethod
-    def points_for_position(cls, player_rating_results: list[RatingResult]) -> list[Decimal]:
+    def _points_for_position(cls, player_rating_results: list[RatingResult]) -> list[Decimal]:
         """Calculates how much each match positions awards in points, if
         no-one has the same position the for loop does nothing except adding
         and dividing again. The match position to point mapping works as following:

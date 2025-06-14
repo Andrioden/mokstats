@@ -1,14 +1,15 @@
 import json
-from operator import itemgetter
 
 from django.core.handlers.wsgi import WSGIRequest
-from django.db.models import Avg, Count, Max, Min, QuerySet
+from django.db.models import Count, Max, Min
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from .config import config
 from .models import Match, Place, Player, PlayerResult
-from .rating import RatingCalculator, RatingResult
+from .rating import RatingCalculator
+from .stats.player_result_statser import PlayerResultStatser
+from .stats.trumph_statser import TrumphStatser
 from .utils import month_name, month_number_padded
 
 
@@ -28,7 +29,7 @@ def players(request: WSGIRequest) -> HttpResponse:
     place_ids = sorted(place_ids)
 
     # Create stats
-    _update_ratings()
+    RatingCalculator.update_ratings()
     match_winners_cache: dict[int, list[Player]] = {}
     players = []
     for player in Player.objects.all():
@@ -77,7 +78,7 @@ def players(request: WSGIRequest) -> HttpResponse:
 
 
 def player(request: WSGIRequest, pid: int) -> HttpResponse:
-    _update_ratings()
+    RatingCalculator.update_ratings()
     player = Player.objects.get(id=pid)
     player_result_ids = PlayerResult.objects.filter(player=player).values_list("match_id", flat=True)
     matches = Match.objects.filter(id__in=player_result_ids)
@@ -146,7 +147,7 @@ def matches(request: WSGIRequest) -> HttpResponse:
 
 
 def match(request: WSGIRequest, mid: int) -> HttpResponse:
-    _update_ratings()
+    RatingCalculator.update_ratings()
     # Get match
     m = Match.objects.select_related("place").get(id=mid)
     results = []
@@ -293,7 +294,7 @@ def stats_biggest_match_sizes(request: WSGIRequest) -> HttpResponse:
 
 
 def rating(request: WSGIRequest) -> HttpResponse:
-    _update_ratings()
+    RatingCalculator.update_ratings()
     if PlayerResult.objects.count() == 0:
         return render(request, "rating.html", {})
     max_rating = PlayerResult.objects.aggregate(Max("rating"))["rating__max"]
@@ -372,190 +373,3 @@ def activity(request: WSGIRequest) -> HttpResponse:
 
 def credits(request: WSGIRequest) -> HttpResponse:
     return render(request, "credits.html", {})
-
-
-def _update_ratings() -> None:
-    players = {}
-    match_ids = list(set(PlayerResult.objects.filter(rating=None).values_list("match_id", flat=True)))
-    for match in Match.objects.filter(id__in=match_ids).order_by("date", "id"):
-        player_positions = match.get_positions()
-        rating_results = []
-        for pp in player_positions:
-            # Fetch the current rating value
-            rated_results = (
-                PlayerResult.objects.filter(player=pp["id"]).exclude(rating=None).order_by("-match__date", "-match__id")
-            )
-            if not rated_results.exists():
-                rating = config.RATING_START
-            else:
-                rating = rated_results[0].rating  # type: ignore[assignment]
-            rating_results.append(RatingResult(pp["id"], rating, pp["position"]))
-        # Calculate new ratings
-        new_player_ratings = RatingCalculator.new_ratings(rating_results)
-        # Update
-        for p in new_player_ratings:
-            players[p.player_id] = p.rating
-            PlayerResult.objects.filter(player=p.player_id).filter(match=match).update(rating=p.rating)
-
-
-class PlayerResultStatser:
-    """Does all kind of statistical fun fact calculations with the supplied PlayerResult object"""
-
-    def __init__(self, all_results: QuerySet[PlayerResult]) -> None:
-        self.all_results = all_results
-
-    def max(self, round_type: str) -> dict:
-        """Returns min or max value for a round type"""
-        field = f"sum_{round_type}"
-        val = self.all_results.aggregate(Max(field))[f"{field}__max"]
-        results = self.all_results.filter(**{field: val})
-        first = results.order_by("match__date", "match__id").select_related()[0]
-        return {"sum": val, "mid": first.match_id, "pid": first.player_id, "pname": first.player.name}
-
-    def avg(self, value_field_usage: str) -> float:
-        select_query = {"total": f"({value_field_usage})"}
-        average = 0.0
-        for res in self.all_results.extra(select=select_query):
-            average += res.total
-        return round(average / self.all_results.count(), 1)
-
-    def gt0_avg(self, round_type: str) -> float:
-        """Average score for the round type for results with greater than 0."""
-        field = f"sum_{round_type}"
-        result = self.all_results.filter(**{f"{field}__gt": 0}).aggregate(Avg(field))
-        return round(result[f"{field}__avg"], 1)  # type: ignore[no-any-return]
-
-    def top_total(self, amount: int) -> list[dict]:
-        return self.top(
-            amount,
-            [
-                "sum_spades",
-                "sum_queens",
-                "sum_solitaire_lines",
-                "sum_solitaire_cards",
-                "sum_pass",
-                "-sum_grand",
-                "-sum_trumph",
-            ],
-        )
-
-    def bot_total(self, amount: int) -> list[dict]:
-        return self.bot(
-            amount,
-            [
-                "sum_spades",
-                "sum_queens",
-                "sum_solitaire_lines",
-                "sum_solitaire_cards",
-                "sum_pass",
-                "-sum_grand",
-                "-sum_trumph",
-            ],
-        )
-
-    def bot(self, max_results: int, fields: list[str]) -> list[dict]:
-        return self.top(max_results, fields, False)
-
-    def top(self, max_results: int, fields: list[str], reverse: bool = True) -> list[dict]:
-        """
-        Use format with a prefix to indicate if added or subtracted to the sum used to determine if its sort value:
-        [
-            "[prefix]<fieldname>",
-        ]
-
-        Example:
-        [
-            "sum_spades",
-            "-sum_queens"
-        ]
-
-        """
-
-        summarized_results = []
-        for result in self.all_results:
-            sum = 0
-            for field in fields:
-                field_multiplicator = 1
-                if field[0] == "-":
-                    field = field[1:]
-                    field_multiplicator = -1
-                sum += getattr(result, field) * field_multiplicator
-
-            summarized_results.append(
-                {"sum": sum, "mid": result.match_id, "pid": result.player_id, "pname": result.player.name}
-            )
-
-        return sorted(summarized_results, key=itemgetter("sum"), reverse=reverse)[:max_results]
-
-
-class TrumphStatser:
-    matches_trumph_picker_not_lost = 0
-
-    def __init__(self, all_results: QuerySet[PlayerResult]):
-        self.all_results = all_results
-        self.set_trumph_stats()
-
-    def set_trumph_stats(self) -> None:
-        match_sorted_results: dict[int, list[PlayerResult]] = {}
-        for res in self.all_results.order_by("match"):
-            if res.match_id not in match_sorted_results:
-                match_sorted_results[res.match_id] = []
-            match_sorted_results[res.match_id].append(res)
-
-        trump_sum_for_trumph_pickers = []
-        for match_results in match_sorted_results.values():
-            trumph_picker_player_result = self.get_trumph_picker_result_from_match_results(match_results)
-
-            if trumph_picker_player_result is None:
-                continue
-            else:
-                # Average trumph picker sum list
-                trump_sum_for_trumph_pickers.append(trumph_picker_player_result.sum_trumph)
-                # Check if trumph picker avoided loss due to trumph pick
-                match_loser_id = self.get_match_loser_id_from_match_results(match_results)
-                if match_loser_id is None:
-                    pass
-                elif trumph_picker_player_result.player_id != match_loser_id:
-                    self.matches_trumph_picker_not_lost += 1
-
-        self.average_trumph_sum_for_trumph_pickers = sum(trump_sum_for_trumph_pickers) / float(
-            len(trump_sum_for_trumph_pickers)
-        )
-
-    def get_trumph_picker_result_from_match_results(self, match_results: list[PlayerResult]) -> PlayerResult | None:
-        highest_sum_before_trumph = -1000
-        has_multiple_trumphers = False
-        trumph_picker_player_result = None
-
-        for res in match_results:
-            total_before_trumph = res.total_before_trumph()
-            if total_before_trumph > highest_sum_before_trumph:
-                highest_sum_before_trumph = total_before_trumph
-                trumph_picker_player_result = res
-                has_multiple_trumphers = False
-            elif total_before_trumph == highest_sum_before_trumph:
-                has_multiple_trumphers = True
-
-        if has_multiple_trumphers:
-            return None
-        else:
-            return trumph_picker_player_result
-
-    def get_match_loser_id_from_match_results(self, match_results: list[PlayerResult]) -> int | None:
-        highest_total_sum = -1000
-        has_multiple_losers = False
-        highest_player_result = None
-
-        for res in match_results:
-            total = res.total()
-            if total > highest_total_sum:
-                highest_total_sum = total
-                highest_player_result = res
-                has_multiple_losers = False
-            elif total == highest_total_sum:
-                has_multiple_losers = True
-
-        if has_multiple_losers:
-            return None
-        else:
-            return highest_player_result.player_id  # type: ignore

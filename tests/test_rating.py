@@ -23,7 +23,7 @@ def test_rating_calculator_win_5_players() -> None:
     ]
 
     # Act
-    new_player_ratings = RatingCalculator.new_ratings(results)
+    new_player_ratings = RatingCalculator._new_ratings(results)
 
     # Assert
     assert new_player_ratings[0].rating == Decimal("101.60")
@@ -44,7 +44,7 @@ def test_rating_calculator_win_4_players() -> None:
     ]
 
     # Act
-    new_player_ratings = RatingCalculator.new_ratings(results)
+    new_player_ratings = RatingCalculator._new_ratings(results)
 
     # Assert
     assert new_player_ratings[0].rating == Decimal("102.00")
@@ -63,7 +63,7 @@ def test_rating_calculator_win_3_players_100() -> None:
     ]
 
     # Act
-    new_player_ratings = RatingCalculator.new_ratings(results)
+    new_player_ratings = RatingCalculator._new_ratings(results)
 
     # Assert
     assert new_player_ratings[0].rating == Decimal("102.6666666666666666666666667")
@@ -81,7 +81,7 @@ def test_rating_calculator_win_3_players_200() -> None:
     ]
 
     # Act
-    new_player_ratings = RatingCalculator.new_ratings(results)
+    new_player_ratings = RatingCalculator._new_ratings(results)
 
     # Assert
     assert new_player_ratings[0].rating == Decimal("201.3333333333333333333333333")
@@ -100,7 +100,7 @@ def test_rating_calculator_draw_pos2() -> None:
     ]
 
     # Act
-    new_player_ratings = RatingCalculator.new_ratings(results)
+    new_player_ratings = RatingCalculator._new_ratings(results)
 
     # Assert
     assert new_player_ratings[0].rating == Decimal("98.00")
@@ -120,7 +120,7 @@ def test_rating_calculator_draw_pos1() -> None:
     ]
 
     # Act
-    new_player_ratings = RatingCalculator.new_ratings(results)
+    new_player_ratings = RatingCalculator._new_ratings(results)
 
     # Assert
     assert new_player_ratings[0].rating == Decimal("101.3333333333333333333333333")
