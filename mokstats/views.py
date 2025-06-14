@@ -184,11 +184,9 @@ def stats(request: WSGIRequest) -> HttpResponse:
 
     data = {
         "spades": {
-            "worst": prs.max("spades"),
             "gt0_average": prs.gt0_avg("spades"),
         },
         "queens": {
-            "worst": prs.max("queens"),
             "gt0_average": prs.gt0_avg("queens"),
         },
         "solitaire": {

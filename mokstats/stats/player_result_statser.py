@@ -84,16 +84,15 @@ class PlayerResultStatser:
 
         summarized_results = []
         for result in self.results:
-            sum = 0
+            sum_ = 0
             for field in fields:
-                field_multiplicator = 1
                 if field[0] == "-":
                     field = field[1:]
-                    field_multiplicator = -1
-                sum += getattr(result, field) * field_multiplicator
+                field_multiplication = -1 if field[0] == "-" else 1
+                sum_ += getattr(result, field) * field_multiplication
 
             summarized_results.append(
-                {"sum": sum, "mid": result.match_id, "pid": result.player_id, "pname": result.player.name}
+                {"sum": sum_, "mid": result.match_id, "pid": result.player_id, "pname": result.player.name}
             )
 
         return sorted(summarized_results, key=itemgetter("sum"), reverse=reverse)[:max_results]
