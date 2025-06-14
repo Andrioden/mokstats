@@ -22,6 +22,7 @@ urlpatterns = [
     path("rating/", views.rating),
     path("rating/description/", views.rating_description),
     path("activity/", views.activity),
+    path("credits/", views.credits),
     # AJAX CALLS
     path("ajax/last_playerlist/", ajax.last_playerlist),
     path("ajax/clear_cache/", ajax.clear_cache),

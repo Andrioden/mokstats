@@ -370,6 +370,10 @@ def activity(request: WSGIRequest) -> HttpResponse:
     return render(request, "activity.html", response_data_jsonified)
 
 
+def credits(request: WSGIRequest) -> HttpResponse:
+    return render(request, "credits.html", {})
+
+
 def _update_ratings() -> None:
     players = {}
     match_ids = list(set(PlayerResult.objects.filter(rating=None).values_list("match_id", flat=True)))
