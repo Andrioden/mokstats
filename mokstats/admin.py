@@ -74,9 +74,7 @@ class ResultInlineFormset(forms.models.BaseInlineFormSet):
 
 class ResultInline(admin.TabularInline):
     exclude = ("rating",)
-    readonly_fields = [
-        "total",
-    ]
+    readonly_fields = ["total"]
     model = PlayerResult
     formset = ResultInlineFormset
     extra = 0
@@ -84,15 +82,10 @@ class ResultInline(admin.TabularInline):
 
 
 class MatchAdmin(admin.ModelAdmin):
-    inlines = [
-        ResultInline,
-    ]
+    inlines = [ResultInline]
 
     class Media:
-        js = (
-            "https://code.jquery.com/jquery-1.8.2.min.js",
-            "admin_custom.js",
-        )
+        js = ("https://code.jquery.com/jquery-1.8.2.min.js", "admin_custom.js")
         css = {"all": ("admin_custom.css",)}
 
 
