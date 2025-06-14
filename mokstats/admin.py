@@ -1,75 +1,41 @@
-from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
+from django.forms import BaseInlineFormSet
 
 from .models import Match, Place, Player, PlayerResult
 
 
-class ResultInlineFormset(forms.models.BaseInlineFormSet):
-    def clean(self) -> None:  # noqa: C901
-        # get forms that actually have valid data
-        player_count = 0
-        spades_total = 0
-        queens_total = 0
-        pass_total = 0
-        grand_total = 0
-        trumph_total = 0
-        players_with_zero_solitaire_cards = 0
-        for form in self.forms:
-            try:
-                if form.cleaned_data:
-                    player_count += 1
+class ResultInlineFormset(BaseInlineFormSet):
+    def clean(self) -> None:
+        forms = [form for form in self.forms if form.cleaned_data]
 
-                    spades_total += form.cleaned_data["sum_spades"]
-
-                    sum_queens = form.cleaned_data["sum_queens"]
-                    if not sum_queens % 4 == 0:
-                        raise forms.ValidationError(
-                            "Ulovlig dameverdi, %s er gitt, bare multiplikasjon av 4 er lovlig" % sum_queens
-                        )
-                    queens_total += sum_queens
-
-                    if form.cleaned_data["sum_solitaire_cards"] == 0:
-                        players_with_zero_solitaire_cards += 1
-
-                    pass_total += form.cleaned_data["sum_pass"]
-                    grand_total += form.cleaned_data["sum_grand"]
-                    trumph_total += form.cleaned_data["sum_trumph"]
-            except AttributeError:
-                pass
+        player_count = len(forms)
         if player_count < 3:
-            raise forms.ValidationError("Minst 3 spillere")
+            raise ValidationError("Må minst vær 3 spillere")
 
-        if player_count in [6, 8, 9]:
-            spades_in_play = 12
-        else:
-            spades_in_play = 13
-        if not spades_total == spades_in_play:
-            raise forms.ValidationError(
-                "For få/mange Spa poeng gitt, %s totalt nå, %s krevd" % (spades_total, spades_in_play)
-            )
+        spades_total = sum(form.cleaned_data.get("sum_spades", 0) for form in forms)
+        queens_total = sum(form.cleaned_data.get("sum_queens", 0) for form in forms)
+        if any(f for f in forms if f.cleaned_data.get("sum_queens", 0) % 4 != 0):
+            raise ValidationError("Ugyldig dameverdi, må være multiplikasjon av 4")
+        pass_total = sum(form.cleaned_data.get("sum_pass", 0) for form in forms)
+        grand_total = sum(form.cleaned_data.get("sum_grand", 0) for form in forms)
+        trumph_total = sum(form.cleaned_data.get("sum_trumph", 0) for form in forms)
+        players_with_zero_solitaire_cards = len([f for f in forms if f.cleaned_data.get("sum_solitaire_cards", 0) == 0])
 
-        if not queens_total == 16:
-            raise forms.ValidationError("For få/mange Damer poeng gitt, %s totalt nå, 16 krevd" % queens_total)
-
-        if players_with_zero_solitaire_cards != 1:
-            raise forms.ValidationError(
-                "For få/mange spillere med 0 kort igjen i Kabal, %s nå, 1 krevd" % players_with_zero_solitaire_cards
-            )
-
+        spades_in_play = 12 if player_count in [6, 8, 9] else 13
         cards_per_player = 52 // player_count
 
-        if not pass_total == cards_per_player:
-            raise forms.ValidationError(
-                "For få/mange Pass poeng gitt, %s totalt nå, %s krevd" % (pass_total, cards_per_player)
-            )
-        if not grand_total == cards_per_player:
-            raise forms.ValidationError(
-                "For få/mange Grand poeng gitt, %s totalt nå, %s krevd" % (grand_total, cards_per_player)
-            )
-        if not trumph_total == cards_per_player:
-            raise forms.ValidationError(
-                "For få/mange Trumf poeng gitt, %s totalt nå, %s krevd" % (trumph_total, cards_per_player)
-            )
+        self.validate_eq(spades_total, spades_in_play, "Ugyldig Spa-poeng gitt, %s totalt nå, %s krevd")
+        self.validate_eq(queens_total, 16, "Ugyldig Dame-poeng gitt, %s totalt nå, %s krevd")
+        self.validate_eq(players_with_zero_solitaire_cards, 1, "%s spillere med 0 kort igjen i Kabal, %s krevd")
+        self.validate_eq(pass_total, cards_per_player, "Ugyldig Pass-poeng gitt, %s totalt nå, %s krevd")
+        self.validate_eq(grand_total, cards_per_player, "Ugyldig Grand-poeng gitt, %s totalt nå, %s krevd")
+        self.validate_eq(trumph_total, cards_per_player, "Ugyldig Trumf-poeng gitt, %s totalt nå, %s krevd")
+
+    @classmethod
+    def validate_eq(cls, a: int, b: int, message: str) -> None:
+        if a != b:
+            raise ValidationError(message % (a, b))
 
 
 class ResultInline(admin.TabularInline):
