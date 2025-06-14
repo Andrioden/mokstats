@@ -11,13 +11,27 @@ Find it here: https://mokstats.appspot.com/
 
 ## Get started
 
-1. Install Python 3.13
-2. Setup python env
+1. Setup python env
+   - Install python 3.13.*
+   - Setup python env
      ``` powershell
      cd backend
      pip install poetry
      poetry sync
      ```
+2. Configure PyCharm
+   - Install PyCharm
+   - Verify poetry and print env paths
+     ``` powershell
+     cd backend
+     poetry check
+     poetry env info
+     ```
+   - PyCharm > Settings > Project: untitledgame > Python Interpreter > Add > Select Existing > Python > [Virtual.Executable from previous step]
+   - Restart PyCharm, start a terminal and verify poetry terminal context
+   - PyCharm > Settings > Lange & Frameworks > Django > 
+     - Tick "Enable Django Support"
+     - Tick "Do not use Django test runner"
 3. Setup database
    - Install Docker Desktop
    - Start docker container

@@ -12,12 +12,10 @@ class RatingResult:
 
 
 class RatingCalculator:
-    def __init__(self) -> None:
-        self.K = config.RATING_K
-
-    def new_ratings(self, player_rating_results: list[RatingResult]) -> list[RatingResult]:
+    @classmethod
+    def new_ratings(cls, player_rating_results: list[RatingResult]) -> list[RatingResult]:
         total_rating = sum([p.rating for p in player_rating_results])
-        points_for_position = self.points_for_position(player_rating_results)
+        points_for_position = cls.points_for_position(player_rating_results)
         total_points = sum(points_for_position)
         # unsported_positions =
         # print total_rating
@@ -28,10 +26,11 @@ class RatingCalculator:
             win_chance = p.rating / total_rating
             expected_points = total_points * win_chance
             actual_points = points_for_position[p.position - 1]
-            p.rating += self.K * (actual_points - expected_points)
+            p.rating += config.RATING_K * (actual_points - expected_points)
         return player_rating_results
 
-    def points_for_position(self, player_rating_results: list[RatingResult]) -> list[Decimal]:
+    @classmethod
+    def points_for_position(cls, player_rating_results: list[RatingResult]) -> list[Decimal]:
         """Calculates how much each match positions awards in points, if
         no-one has the same position the for loop does nothing except adding
         and dividing again. The match position to point mapping works as following:
@@ -43,7 +42,7 @@ class RatingCalculator:
         # Create the normal position to point mapping
         # Change this part if the balance between position, player count and points awarded
         # needs to be changed.
-        point_flux = self.K * 2  # Total amount of points in movement for 1 match
+        point_flux = config.RATING_K * 2  # Total amount of points in movement for 1 match
         points_parts = sum(i for i in range(len(player_rating_results)))
         points = []
         for i in reversed(list(range(len(player_rating_results)))):

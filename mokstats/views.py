@@ -371,7 +371,6 @@ def activity(request: WSGIRequest) -> HttpResponse:
 
 
 def _update_ratings() -> None:
-    calc = RatingCalculator()
     players = {}
     match_ids = list(set(PlayerResult.objects.filter(rating=None).values_list("match_id", flat=True)))
     for match in Match.objects.filter(id__in=match_ids).order_by("date", "id"):
@@ -388,7 +387,7 @@ def _update_ratings() -> None:
                 rating = rated_results[0].rating  # type: ignore[assignment]
             rating_results.append(RatingResult(pp["id"], rating, pp["position"]))
         # Calculate new ratings
-        new_player_ratings = calc.new_ratings(rating_results)
+        new_player_ratings = RatingCalculator.new_ratings(rating_results)
         # Update
         for p in new_player_ratings:
             players[p.player_id] = p.rating
