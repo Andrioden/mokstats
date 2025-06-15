@@ -62,10 +62,10 @@ class PlayerResultStatser:
             ],
         )
 
-    def bot(self, max_results: int, fields: list[str]) -> list[dict]:
-        return self.top(max_results, fields, False)
+    def bot(self, amount: int, fields: list[str]) -> list[dict]:
+        return self.top(amount, fields, False)
 
-    def top(self, max_results: int, fields: list[str], reverse: bool = True) -> list[dict]:
+    def top(self, amount: int, fields: list[str], reverse: bool = True) -> list[dict]:
         """
         Fields:
 
@@ -82,8 +82,13 @@ class PlayerResultStatser:
 
         """
 
-        summarized_results = []
+        # Step 1 - Build result sums
+        match_sizes = {}
+        sum_results = []
         for result in self.results:
+            if result.match_id not in match_sizes:
+                match_sizes[result.match_id] = 0
+            match_sizes[result.match_id] += 1
             sum_ = 0
             for field in fields:
                 if field[0] == "-":
@@ -91,8 +96,13 @@ class PlayerResultStatser:
                 field_multiplication = -1 if field[0] == "-" else 1
                 sum_ += getattr(result, field) * field_multiplication
 
-            summarized_results.append(
+            sum_results.append(
                 {"sum": sum_, "mid": result.match_id, "pid": result.player_id, "pname": result.player.name}
             )
 
-        return sorted(summarized_results, key=itemgetter("sum"), reverse=reverse)[:max_results]
+        # Step 2 - Append match size to each result
+        for res in sum_results:
+            res["match_size"] = match_sizes[res["mid"]]  # type: ignore[index]
+
+        # Step 3 - Sort results and return top N
+        return sorted(sum_results, key=itemgetter("sum"), reverse=reverse)[:amount]

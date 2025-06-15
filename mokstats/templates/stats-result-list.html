@@ -1,24 +1,24 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 
 {% block title %}{{title}}{% endblock %}
 
 {% block content %}
 	<!-- Start of first page -->
 	<div data-role="page" id="stats_top_results_page">
-	
+
 		<div data-role="header">
 			<a href="../../" data-role="button" data-icon="home" data-iconpos="notext"></a>
 			<h1>{{title}}</h1>
 		</div>
-		
-	
+
+
 		<div data-role="content">
 			<ol data-role="listview" data-filter="true">
 			{% for r in results %}
 			    <li>
 			    	<span class="ui-li-count">{{r.sum}}</span>
-			    	<span style="cursor: pointer;" onclick='$.mobile.changePage("../../players/{{r.pid}}/")'>{{r.pname}}</span>
-			    	<span class="smaller">(<a href="../../matches/{{r.mid}}/">kampen</a>)</span>
+			    	<span>{{r.pname}}</span>
+			    	<span class="smaller">(<a href="../../matches/{{r.mid}}/">{{ r.match_size}}-spiler kamp</a>)</span>
 			    </li>
 			{% endfor %}
 			</ol>
