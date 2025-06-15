@@ -188,6 +188,9 @@ def stats(request: WSGIRequest) -> HttpResponse:
         },
         "queens": {
             "gt0_average": prs.gt0_avg("queens"),
+            "percent_4": round(ms.queens_percent_4 * 100, 1),
+            "win_percent_if_4": round(ms.queens_win_percent_if_4 * 100, 1),
+            "loss_percent_if_4": round(ms.queens_loss_percent_if_4 * 100, 1),
         },
         "solitaire": {
             "lines_lowest_total": {
