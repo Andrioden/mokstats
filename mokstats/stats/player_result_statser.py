@@ -86,14 +86,16 @@ class PlayerResultStatser:
         match_sizes = {}
         sum_results = []
         for result in self.results:
+            # Cache match player sizes
             if result.match_id not in match_sizes:
                 match_sizes[result.match_id] = 0
             match_sizes[result.match_id] += 1
+
+            # Calculate sum
             sum_ = 0
             for field in fields:
-                if field[0] == "-":
-                    field = field[1:]
                 field_multiplication = -1 if field[0] == "-" else 1
+                field = field[1:] if field[0] == "-" else field
                 sum_ += getattr(result, field) * field_multiplication
 
             sum_results.append(
